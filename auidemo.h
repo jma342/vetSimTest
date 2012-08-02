@@ -45,95 +45,13 @@ public:
 };
 
 
-//class wxSizeReportCtrl;
-// -- wxSizeReportCtrl --
-// (a utility control that always reports it's client size)
-
-class wxSizeReportCtrl : public wxControl
-{
-public:
-
-    wxSizeReportCtrl(wxWindow* parent, wxWindowID id = wxID_ANY,
-                     const wxPoint& pos = wxDefaultPosition,
-                     const wxSize& size = wxDefaultSize,
-                     wxAuiManager* mgr = NULL)
-                     : wxControl(parent, id, pos, size, wxNO_BORDER)
-    {
-        m_mgr = mgr;
-    }
-
-private:
-
-    void OnPaint(wxPaintEvent& WXUNUSED(evt));
-
-    void OnEraseBackground(wxEraseEvent& WXUNUSED(evt));
-
-    void OnSize(wxSizeEvent& WXUNUSED(evt));
-
-private:
-
-    wxAuiManager* m_mgr;
-
-    DECLARE_EVENT_TABLE()
-};
-
-
-
 // -- frame --
 
 class MyFrame : public wxFrame
 {
     enum
     {
-        ID_CreateTree = wxID_HIGHEST+1,
-        ID_CreateGrid,
-        ID_CreateText,
-        ID_CreateHTML,
-        ID_CreateNotebook,
-        ID_CreateSizeReport,
-        ID_GridContent,
-        ID_TextContent,
-        ID_TreeContent,
-        ID_HTMLContent,
-        ID_NotebookContent,
-        ID_SizeReportContent,
-        ID_CreatePerspective,
-        ID_CopyPerspectiveCode,
-        ID_AllowFloating,
-        ID_AllowActivePane,
-        ID_TransparentHint,
-        ID_VenetianBlindsHint,
-        ID_RectangleHint,
-        ID_NoHint,
-        ID_HintFade,
-        ID_NoVenetianFade,
-        ID_TransparentDrag,
-        ID_NoGradient,
-        ID_VerticalGradient,
-        ID_HorizontalGradient,
-        ID_LiveUpdate,
-        ID_AllowToolbarResizing,
-        ID_Settings,
-        ID_CustomizeToolbar,
-        ID_DropDownToolbarItem,
-        ID_NotebookNoCloseButton,
-        ID_NotebookCloseButton,
-        ID_NotebookCloseButtonAll,
-        ID_NotebookCloseButtonActive,
-        ID_NotebookAllowTabMove,
-        ID_NotebookAllowTabExternalMove,
-        ID_NotebookAllowTabSplit,
-        ID_NotebookWindowList,
-        ID_NotebookScrollButtons,
-        ID_NotebookTabFixedWidth,
-        ID_NotebookArtGloss,
-        ID_NotebookArtSimple,
-        ID_NotebookAlignTop,
-        ID_NotebookAlignBottom,
-
-        ID_SampleItem,
-
-		/*FileMenuEvents*/
+        /*FileMenuEvents*/
 		ID_StartScenario /*= 1*/,
 		ID_MonitorSound,
 		ID_ImportVocalSounds,
@@ -181,8 +99,8 @@ class MyFrame : public wxFrame
 		ID_saveLayout,
 		ID_loadLayout,
 		ID_adminOverwritePresetLayouts,
-		ID_adminOverwritePresetLayouts_choice,
-        ID_FirstPerspective = ID_CreatePerspective+1000
+		ID_adminOverwritePresetLayouts_choice
+        
     };
 
 public:
@@ -195,226 +113,123 @@ public:
 
     ~MyFrame();
 
-    wxAuiDockArt* GetDockArt();
-    void DoUpdate();
-
-private:
-    wxTextCtrl* CreateTextCtrl(const wxString& text = wxEmptyString);
-    wxGrid* CreateGrid();
-    wxTreeCtrl* CreateTreeCtrl();
-    wxSizeReportCtrl* CreateSizeReportCtrl(int width = 80, int height = 80);
-    wxPoint GetStartPosition();
-    wxHtmlWindow* CreateHTMLCtrl(wxWindow* parent = NULL);
-    wxAuiNotebook* CreateNotebook();
-
-    wxString GetIntroText();
-
 private:
 
-    void OnEraseBackground(wxEraseEvent& evt);
-    void OnSize(wxSizeEvent& evt);
+	 wxAuiManager m_mgr;
+	/*FileMenuEvents*/
+	void onStartScenario(wxCommandEvent& event);
+	void onMonitorSound(wxCommandEvent& event);
+	void onImportVocalSounds(wxCommandEvent& event);
+	void onImportMediaFiles(wxCommandEvent& event);
+	void onAddMediaFiles(wxCommandEvent& event);
+	void onExit(wxCommandEvent& event);
 
-    void OnCreateTree(wxCommandEvent& evt);
-    void OnCreateGrid(wxCommandEvent& evt);
-    void OnCreateHTML(wxCommandEvent& evt);
-    void OnCreateNotebook(wxCommandEvent& evt);
-    void OnCreateText(wxCommandEvent& evt);
-    void OnCreateSizeReport(wxCommandEvent& evt);
-    void OnChangeContentPane(wxCommandEvent& evt);
-    
-    void OnCreatePerspective(wxCommandEvent& evt);
-    void OnCopyPerspectiveCode(wxCommandEvent& evt);
-    void OnRestorePerspective(wxCommandEvent& evt);
-    void OnSettings(wxCommandEvent& evt);
-    void OnCustomizeToolbar(wxCommandEvent& evt);
-    void OnAllowNotebookDnD(wxAuiNotebookEvent& evt);
-    void OnNotebookPageClose(wxAuiNotebookEvent& evt);
-    void OnNotebookPageClosed(wxAuiNotebookEvent& evt);
-    void OnExit(wxCommandEvent& evt);
-    void OnAbout(wxCommandEvent& evt);
-    void OnTabAlignment(wxCommandEvent &evt);
+	/*ViewMenuEvents*/
+	void onPatientInstructorMonitor(wxCommandEvent& event);
 
-    void OnGradient(wxCommandEvent& evt);
-    void OnToolbarResizing(wxCommandEvent& evt);
-    void OnManagerFlag(wxCommandEvent& evt);
-    void OnNotebookFlag(wxCommandEvent& evt);
-    void OnUpdateUI(wxUpdateUIEvent& evt);
+	/*SimulationMenuEvents*/
+	void onStartSimulation(wxCommandEvent& event);
+	void onPauseSimulation(wxCommandEvent& event);
+	void onFastForward(wxCommandEvent& event);
+	void onHaltScenario(wxCommandEvent& event);
+	void onDefaultScenario(wxCommandEvent& event);
 
-   
+	/*EditMenuEvents*/
+	void onMonitorSetup(wxCommandEvent& event);
+	void onVitalSigns(wxCommandEvent& event);
 
-private:
+	/*HelpMenuEvents*/
+	void onAbout(wxCommandEvent& event);
+	void onHelp(wxCommandEvent& event);
 
-    wxAuiManager m_mgr;
-    wxArrayString m_perspectives;
-    wxMenu* m_perspectives_menu;
-    long m_notebook_style;
-    long m_notebook_theme;
+	/*ScreenLayoutEvents*/
+	void onDefaultMode(wxCommandEvent& event);
+	void onManualMode(wxCommandEvent& event);
+	void onPreProgrammedMode(wxCommandEvent& event);
 
-private:
+	/*CustomizeDefaultScreenLayoutEvents*/
+	void onMannequin(wxCommandEvent& event);
+	void onInstructorPatientMonitor(wxCommandEvent& event);
+	void onEventsLog(wxCommandEvent& event);
+	void onEventsList_ShowAll(wxCommandEvent& event);
+	void onExpandAllEventsLists(wxCommandEvent& event);
+	void onEventsList_HideAll(wxCommandEvent& event);
+	void onEventsList_ABC(wxCommandEvent& event);
+	void onEventsList_Med(wxCommandEvent& event);
+	void onEventsList_Misc(wxCommandEvent& event);
+	void onScenarioControls(wxCommandEvent& event);
+	void OnDropDownToolbarItem_eventsList(wxAuiToolBarEvent& evt);
 
-		/*FileMenuEvents*/
-		void onStartScenario(wxCommandEvent& event);
-		void onMonitorSound(wxCommandEvent& event);
-		void onImportVocalSounds(wxCommandEvent& event);
-		void onImportMediaFiles(wxCommandEvent& event);
-		void onAddMediaFiles(wxCommandEvent& event);
-		void onExit(wxCommandEvent& event);
+	void DefaultScreenLayout();
+	//void setScreenLayout(int mode);
+	void setSubScreensOnToolBar();
 
-		/*ViewMenuEvents*/
-		void onPatientInstructorMonitor(wxCommandEvent& event);
+	void onSaveCustomLayout(wxCommandEvent& event);
+	void onLoadCustomLayout(wxCommandEvent& event);
 
-		/*SimulationMenuEvents*/
-		void onStartSimulation(wxCommandEvent& event);
-		void onPauseSimulation(wxCommandEvent& event);
-		void onFastForward(wxCommandEvent& event);
-		void onHaltScenario(wxCommandEvent& event);
-		void onDefaultScenario(wxCommandEvent& event);
+	void toggleMannequin();
+	void toggleInstructorPatientMonitor();
+	void toggleEventsLog();
+	void toggleEventsList();
+	void toggleScenarioControls();
 
-		/*EditMenuEvents*/
-		void onMonitorSetup(wxCommandEvent& event);
-		void onVitalSigns(wxCommandEvent& event);
+	void OnPaneClose(wxAuiManagerEvent& evt);
+	void onPaneMaximize(wxAuiManagerEvent& evt);
+	void onRestorePane(wxAuiManagerEvent& evt);
 
-		/*HelpMenuEvents*/
-		void onAbout(wxCommandEvent& event);
-		void onHelp(wxCommandEvent& event);
+	void onOverwritePresetLayout(wxCommandEvent& event);
 
-		/*ScreenLayoutEvents*/
-		void onDefaultMode(wxCommandEvent& event);
-		void onManualMode(wxCommandEvent& event);
-		void onPreProgrammedMode(wxCommandEvent& event);
+	void overWritePresetLayout(int chosenPresetLayout);
 
-		/*CustomizeDefaultScreenLayoutEvents*/
-		void onMannequin(wxCommandEvent& event);
-		void onInstructorPatientMonitor(wxCommandEvent& event);
-		void onEventsLog(wxCommandEvent& event);
-		void onEventsList_ShowAll(wxCommandEvent& event);
-		void onExpandAllEventsLists(wxCommandEvent& event);
-		void onEventsList_HideAll(wxCommandEvent& event);
-		void onEventsList_ABC(wxCommandEvent& event);
-		void onEventsList_Med(wxCommandEvent& event);
-		void onEventsList_Misc(wxCommandEvent& event);
-		void onScenarioControls(wxCommandEvent& event);
-		void OnDropDownToolbarItem_eventsList(wxAuiToolBarEvent& evt);
+	void loadAllPresetLayouts();
 
-		void DefaultScreenLayout();
-		//void setScreenLayout(int mode);
-		void setSubScreensOnToolBar();
+	void updateLayoutForCurrentScreenSize(int chosenScreenLayout);
+	void updateCustomLayoutForCurrentScreenSize();
+	void saveCustomLayoutWithScreenSettings();
+	void saveCustomLayoutWithOUTScreenSettings();
+	void loadCustomLayoutWithScreenSettings();
+	void loadCustomLayoutWithOUTScreenSettings();
 
-		void onSaveCustomLayout(wxCommandEvent& event);
-		void onLoadCustomLayout(wxCommandEvent& event);
+	MyScrolledWindowBase *mannequin,
+							*instructorPatientMonitor, *eventsList_ABC,*eventsList_Misc,*eventsList_Med, *eventsLog,*scenarioControls;
 
-		void toggleMannequin();
-		void toggleInstructorPatientMonitor();
-		void toggleEventsLog();
-		void toggleEventsList();
-		void toggleScenarioControls();
+	wxVector<MyScrolledWindowBase *> orphanWindows;
 
-		void OnPaneClose(wxAuiManagerEvent& evt);
-		void onPaneMaximize(wxAuiManagerEvent& evt);
-		void onRestorePane(wxAuiManagerEvent& evt);
+	wxSizerItem *mannequin_SizerItem,
+							*instructorPatientMonitor_SizerItem, *eventsList_ABC_SizerItem,*eventsList_Misc_SizerItem,
+							*eventsList_Med_SizerItem, *eventsLog_SizerItem,*scenarioControls_SizerItem;
 
-		void onOverwritePresetLayout(wxCommandEvent& event);
+	wxSizer *sizerScrollWin_eventsLogList, *sizerScrollWin_Mannequin_InstructorMonitor,*sizerScrollWin_scenControls;
 
-		void overWritePresetLayout(int chosenPresetLayout);
+	wxPanel *panel;
+	wxSizer *topsizer;
+	wxSize initialFrameSize;
 
-		void loadAllPresetLayouts();
+	wxMenu *menuScreenLayout;
+	wxMenu *menuHelp;
+	wxMenu *menuEdit;
+	wxMenu *menuSimulation;
+	wxMenu *menuView;
+	wxMenu *menuFile;
+	wxMenu *menuCustomiszeDefaultScreenLayout;
+	wxMenuBar *menuBar;
+	wxMenu *menuPopup_EventsList;
 
-		void updateLayoutForCurrentScreenSize(int chosenScreenLayout);
-		void updateCustomLayoutForCurrentScreenSize();
-		void saveCustomLayoutWithScreenSettings();
-		void saveCustomLayoutWithOUTScreenSettings();
-		void loadCustomLayoutWithScreenSettings();
-		void loadCustomLayoutWithOUTScreenSettings();
+	wxAuiToolBar* subScreensBar;
+	wxAuiToolBar* adminOverWritePresetLayoutBar;
 
-		MyScrolledWindowBase *mannequin,
-							 *instructorPatientMonitor, *eventsList_ABC,*eventsList_Misc,*eventsList_Med, *eventsLog,*scenarioControls;
+	wxChoice* layoutChoice;
 
-		wxVector<MyScrolledWindowBase *> orphanWindows;
+	wxString currentPerspective;
+	wxString presetLayouts[3];
+	int presetLayoutsNativeScreenWidth[3];
+	int presetLayoutsNativeScreenHeight[3];
 
-		wxSizerItem *mannequin_SizerItem,
-							 *instructorPatientMonitor_SizerItem, *eventsList_ABC_SizerItem,*eventsList_Misc_SizerItem,
-							 *eventsList_Med_SizerItem, *eventsLog_SizerItem,*scenarioControls_SizerItem;
-
-		wxSizer *sizerScrollWin_eventsLogList, *sizerScrollWin_Mannequin_InstructorMonitor,*sizerScrollWin_scenControls;
-
-		wxPanel *panel;
-		wxSizer *topsizer;
-		wxSize initialFrameSize;
-
-		wxMenu *menuScreenLayout;
-		wxMenu *menuHelp;
-		wxMenu *menuEdit;
-		wxMenu *menuSimulation;
-		wxMenu *menuView;
-		wxMenu *menuFile;
-		wxMenu *menuCustomiszeDefaultScreenLayout;
-		wxMenuBar *menuBar;
-		wxMenu *menuPopup_EventsList;
-
-		wxAuiToolBar* subScreensBar;
-		wxAuiToolBar* adminOverWritePresetLayoutBar;
-
-		wxChoice* layoutChoice;
-
-		wxString currentPerspective;
-		wxString presetLayouts[3];
-		int presetLayoutsNativeScreenWidth[3];
-		int presetLayoutsNativeScreenHeight[3];
-
-		int customLayoutNativeScreenWidth;
-		int customLayoutNativeScreenHeight;
+	int customLayoutNativeScreenWidth;
+	int customLayoutNativeScreenHeight;
 		
 
-    DECLARE_EVENT_TABLE()
-};
-
-class SettingsPanel : public wxPanel
-{
-    enum
-    {
-        ID_PaneBorderSize = wxID_HIGHEST+1,
-        ID_SashSize,
-        ID_CaptionSize,
-        ID_BackgroundColor,
-        ID_SashColor,
-        ID_InactiveCaptionColor,
-        ID_InactiveCaptionGradientColor,
-        ID_InactiveCaptionTextColor,
-        ID_ActiveCaptionColor,
-        ID_ActiveCaptionGradientColor,
-        ID_ActiveCaptionTextColor,
-        ID_BorderColor,
-        ID_GripperColor
-    };
-
-public:
-	SettingsPanel(wxWindow* parent, MyFrame* frame);
-
-private:
-
-    wxBitmap CreateColorBitmap(const wxColour& c);
-	void UpdateColors();
-	void OnPaneBorderSize(wxSpinEvent& event);
-	void OnSashSize(wxSpinEvent& event);
-	void OnCaptionSize(wxSpinEvent& event);
-    void OnSetColor(wxCommandEvent& event);
-
-    MyFrame* m_frame;
-    wxSpinCtrl* m_border_size;
-    wxSpinCtrl* m_sash_size;
-    wxSpinCtrl* m_caption_size;
-    wxBitmapButton* m_inactive_caption_text_color;
-    wxBitmapButton* m_inactive_caption_gradient_color;
-    wxBitmapButton* m_inactive_caption_color;
-    wxBitmapButton* m_active_caption_text_color;
-    wxBitmapButton* m_active_caption_gradient_color;
-    wxBitmapButton* m_active_caption_color;
-    wxBitmapButton* m_sash_color;
-    wxBitmapButton* m_background_color;
-    wxBitmapButton* m_border_color;
-    wxBitmapButton* m_gripper_color;
-
-    DECLARE_EVENT_TABLE()
+	DECLARE_EVENT_TABLE()
 };
 
 #endif

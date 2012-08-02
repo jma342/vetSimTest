@@ -38,8 +38,6 @@ bool MyApp::OnInit()
 }
 
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
-    EVT_ERASE_BACKGROUND(MyFrame::OnEraseBackground)
-    EVT_SIZE(MyFrame::OnSize)
     
 	/*FileMenuEvents*/
 	EVT_MENU(ID_StartScenario, MyFrame::onStartScenario)
@@ -110,16 +108,9 @@ MyFrame::MyFrame(wxWindow* parent,
     // set frame icon
     SetIcon(wxIcon(sample_xpm));
 
-    // set up default notebook style
-    m_notebook_style = wxAUI_NB_DEFAULT_STYLE | wxAUI_NB_TAB_EXTERNAL_MOVE | wxNO_BORDER;
-    m_notebook_theme = 0;
-
     // create menu
-    //wxMenuBar* mb = new wxMenuBar;
 	menuBar =  new wxMenuBar;
 
-    //wxMenu* file_menu = new wxMenu;
-    //file_menu->Append(wxID_EXIT);
 	/*FileMenuEvents*/
 	menuFile = new wxMenu;
 	menuFile->Append(ID_StartScenario, ("Start Scenario"), "Starts an existing scenario");
@@ -170,27 +161,11 @@ MyFrame::MyFrame(wxWindow* parent,
     CreateStatusBar();
     GetStatusBar()->SetStatusText(_("Ready"));
 
-
-    // min size for the frame itself isn't completely done.
-    // see the end up wxAuiManager::Update() for the test
-    // code. For now, just hard code a frame minimum size
-    //SetMinSize(wxSize(400,300));
-	
-	/*wxString screenSize;
-	wxClientDC *screen = new wxClientDC(this);
-
-	screenSize.Printf("System Settings: Height %d Width %d",
-		wxSystemSettings::GetMetric(wxSYS_SCREEN_X),
-		wxSystemSettings::GetMetric(wxSYS_SCREEN_Y));
-
-	wxMessageBox(screenSize);*/
-
 	SetBestSize(wxSize(wxSystemSettings::GetMetric(wxSYS_SCREEN_X),
 		wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)));
 
 	SetMaxSize(wxSize(wxSystemSettings::GetMetric(wxSYS_SCREEN_X),
 		wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)));
-	//SetMaxSize(wxSize(1280,800));
 
 	this->Maximize();
 
@@ -712,6 +687,7 @@ void MyFrame::onExpandAllEventsLists(wxCommandEvent& WXUNUSED(event))
 {
 	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Expand_All_Folders))
 	{
+
 		((EventsList*)eventsList_ABC)->expandAllFolders();
 		((EventsList*)eventsList_Misc)->expandAllFolders();
 		((EventsList*)eventsList_Med)->expandAllFolders();
@@ -1426,25 +1402,7 @@ void MyFrame::onAbout(wxCommandEvent& WXUNUSED(event))
 	wxMessageBox(("This is wxWidgets hello world sample"),
 		("About Hello World"), wxOK | wxICON_INFORMATION,this);
 }
-wxAuiDockArt* MyFrame::GetDockArt()
-{
-    return m_mgr.GetArtProvider();
-}
 
-//void MyFrame::DoUpdate()
-//{
-//    m_mgr.Update();
-//}
-//
-void MyFrame::OnEraseBackground(wxEraseEvent& event)
-{
-    event.Skip();
-}
-
-void MyFrame::OnSize(wxSizeEvent& event)
-{
-    event.Skip();
-}
 
 void MyFrame::OnPaneClose(wxAuiManagerEvent& evt)
 {
