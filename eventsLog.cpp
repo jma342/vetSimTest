@@ -1,100 +1,103 @@
 #include "eventsLog.h"
 
+const int ROWSIZE = 25;//sets the size of the rows for the events log grid
+const int TIME_SIZE = 20;//sets the size of the column for time stamping
+const int MESSAGE_SENDER_SIZE = 50;//sets the size of the coumn used to store the object that sent the message 
+const int MESSAGE_SIZE = 550;
 
-//namespace vetSimulatorUI
-//{
-	const int ROWSIZE = 25;
-	const int TIME_SIZE = 20;
-	const int MESSAGE_SENDER_SIZE = 50;
-	const int MESSAGE_SIZE = 550;
+//stores the column location for each of the 3 columns
+const int TIME = 0;
+const int MESSAGE_SENDER = 1;
+const int MESSAGE = 2;
 
-	const int TIME = 0;
-	const int MESSAGE_SENDER = 1;
-	const int MESSAGE = 2;
+//intialises the events log object
+EventsLog::EventsLog(wxWindow *parent):MyScrolledWindowSmart(parent)
+{
+	//indicates that neither of the scroll bars will be displayed
+	this->ShowScrollbars(wxSHOW_SB_NEVER,wxSHOW_SB_NEVER);
 
+	//initialises the grid for the events log
+	eventsLogGrid = new wxGrid( this,
+                    wxID_ANY,
+                    wxPoint( 0, 0 ),
+                    wxSize( 450, 206) );
 
-	EventsLog::EventsLog(wxWindow *parent):MyScrolledWindowSmart(parent)
+	eventsLogGrid->CreateGrid(0,0);
+
+	eventsLogGrid->AppendRows(1);
+	eventsLogGrid->AppendCols(3);
+
+	eventsLogGrid->SetCellValue(0,TIME,"TIME");
+	eventsLogGrid->SetCellValue(0,MESSAGE_SENDER,"MESSAGE SENDER");
+	eventsLogGrid->SetCellValue(0,MESSAGE,"MESSAGE");
+
+	eventsLogGrid->SetRowSize(0,ROWSIZE);
+	eventsLogGrid->SetColSize(TIME,TIME_SIZE);
+	eventsLogGrid->SetColSize(MESSAGE_SENDER,MESSAGE_SENDER_SIZE);
+	eventsLogGrid->SetColSize(MESSAGE,MESSAGE_SIZE);
+
+	//ensures the the columns and the rows each adjust based on their contest
+	eventsLogGrid->AutoSizeColumns(true);
+	eventsLogGrid->AutoSizeRows(true);
+
+	eventsLogGrid->SetRowLabelSize(0);
+	eventsLogGrid->SetColLabelSize(0);
+
+	//ensures that the grid is not editable from the UI as it
+	//receives messages from other events triggered on the UI and by the physical 
+	//mannequin it self
+	eventsLogGrid->SetEditable(false);
+
+}
+
+//jma342--used to add capture events in the events log
+bool EventsLog::updateLog(int msg_sndr,wxString message,long milliSecondsElapsed)
+{
+	wxString msg_sndr_str = "";
+
+	//ensures messages are received from the exepcted objects
+	if(msg_sndr != SCENRAIO_FRAME_MSG && msg_sndr != AVATAR_MSG && msg_sndr != MANNEQUIN_MSG && msg_sndr != EVENT_LIST_MSG)
 	{
-		this->ShowScrollbars(wxSHOW_SB_NEVER,wxSHOW_SB_NEVER);
-
-		eventsLogGrid = new wxGrid( this,
-                       wxID_ANY,
-                       wxPoint( 0, 0 ),
-                       wxSize( 450, 206) );
-
-		eventsLogGrid->CreateGrid(0,0);
-
-		eventsLogGrid->AppendRows(1);
-		eventsLogGrid->AppendCols(3);
-
-		eventsLogGrid->SetCellValue(0,TIME,"TIME");
-		eventsLogGrid->SetCellValue(0,MESSAGE_SENDER,"MESSAGE SENDER");
-		eventsLogGrid->SetCellValue(0,MESSAGE,"MESSAGE");
-
-		eventsLogGrid->SetRowSize(0,ROWSIZE);
-		eventsLogGrid->SetColSize(TIME,TIME_SIZE);
-		eventsLogGrid->SetColSize(MESSAGE_SENDER,MESSAGE_SENDER_SIZE);
-		eventsLogGrid->SetColSize(MESSAGE,MESSAGE_SIZE);
-
-		eventsLogGrid->AutoSizeColumns(true);
-		eventsLogGrid->AutoSizeRows(true);
-
-		eventsLogGrid->SetRowLabelSize(0);
-		eventsLogGrid->SetColLabelSize(0);
-
-		eventsLogGrid->SetEditable(false);
-
-		//testVar = value;
+		return false;
+	}
+	else if(msg_sndr == SCENRAIO_FRAME_MSG)
+	{
+		msg_sndr_str = "SCENRAIO_FRAME";
+	}
+	else if(msg_sndr == AVATAR_MSG)
+	{
+		msg_sndr_str = "AVATAR";
+	}
+	else if(msg_sndr == MANNEQUIN_MSG)
+	{
+		msg_sndr_str = "MANNEQUNIN";
+	}
+	else if(msg_sndr == EVENT_LIST_MSG)
+	{
+		msg_sndr_str = "EVENT LIST";
 	}
 
-	bool EventsLog::updateLog(int msg_sndr,wxString message,long milliSecondsElapsed)
-	{
-		wxString msg_sndr_str = "";
 
-		if(msg_sndr != SCENRAIO_FRAME_MSG && msg_sndr != AVATAR_MSG && msg_sndr != MANNEQUIN_MSG && msg_sndr != EVENT_LIST_MSG)
-		{
-			return false;
-		}
-		else if(msg_sndr == SCENRAIO_FRAME_MSG)
-		{
-			msg_sndr_str = "SCENRAIO_FRAME";
-		}
-		else if(msg_sndr == AVATAR_MSG)
-		{
-			msg_sndr_str = "AVATAR";
-		}
-		else if(msg_sndr == MANNEQUIN_MSG)
-		{
-			msg_sndr_str = "MANNEQUNIN";
-		}
-		else if(msg_sndr == EVENT_LIST_MSG)
-		{
-			msg_sndr_str = "EVENT LIST";
-		}
+	int nMinutes = (int)(milliSecondsElapsed/ 60000);
+	int nSeconds = (int)((milliSecondsElapsed% 60000)/1000);
 
+	wxString sTimePosition;
 
-		int nMinutes = (int)(milliSecondsElapsed/ 60000);
-		int nSeconds = (int)((milliSecondsElapsed% 60000)/1000);
+	sTimePosition.Printf(wxT("%2i:%02i"), nMinutes, nSeconds);
 
-		wxString sTimePosition;
+	//appends the next row to receive log data
+	eventsLogGrid->AppendRows(1);
 
-		sTimePosition.Printf(wxT("%2i:%02i"), nMinutes, nSeconds);
+	//sets the values for each of the cells in the next row to be updated
+	eventsLogGrid->SetCellValue(eventsLogGrid->GetNumberRows()-1,TIME,sTimePosition.c_str());
+	eventsLogGrid->SetCellValue(eventsLogGrid->GetNumberRows()-1,MESSAGE_SENDER,msg_sndr_str);
+	eventsLogGrid->SetCellValue(eventsLogGrid->GetNumberRows()-1,MESSAGE,message);
 
-		eventsLogGrid->AppendRows(1);
+	//resizes columns and last updated row if necessary
+	eventsLogGrid->AutoSizeColumns(true);
+	eventsLogGrid->AutoSizeRow(eventsLogGrid->GetNumberRows()-1,true);
 
-		eventsLogGrid->SetCellValue(eventsLogGrid->GetNumberRows()-1,TIME,sTimePosition.c_str());
-		eventsLogGrid->SetCellValue(eventsLogGrid->GetNumberRows()-1,MESSAGE_SENDER,msg_sndr_str);
-		eventsLogGrid->SetCellValue(eventsLogGrid->GetNumberRows()-1,MESSAGE,message);
+	//indicates successful update
+	return true;
 		
-		eventsLogGrid->AutoSizeColumns(true);
-		eventsLogGrid->AutoSizeRow(eventsLogGrid->GetNumberRows()-1,true);
-
-		return true;
-		
-	}
-
-	/*void EventsLog::OnDraw(wxDC &dc)
-	{}*/
-
-
-//}
+}

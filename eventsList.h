@@ -7,76 +7,65 @@
 #define EVENTSLIST_H
 
 #include "scenarioControls.h"
-//namespace vetSimulatorUI
-//{
-	class EventsList : public MyScrolledWindowSmart
+
+class EventsList : public MyScrolledWindowSmart
+{
+public:
+	EventsList(wxWindow *parent,wxString Column);
+		
+	void rightClick(wxTreeListEvent& event);
+	void doubleClick(wxTreeListEvent& event);
+
+	void addItem();
+	void administerItem(wxTreeListItem item);
+	void removeItem();
+	void expandAllFolders();
+	void collapseAllFolders();
+	void setEventsLog(EventsLog *);
+	void setScenarioControls(ScenarioControls *);
+
+private:
+	wxWindow *parent;
+
+	enum
 	{
-	public:
-		EventsList(wxWindow *parent,wxString Column);
-		
-		//virtual void OnDraw(wxDC& dc);
-
-		//void rightClick(wxTreeEvent& event/*wxTreeListEvent& event*/);
-		void rightClick(wxTreeListEvent& event);
-		void doubleClick(wxTreeListEvent& event);
-
-		void addItem();
-		void administerItem(wxTreeListItem item);
-		void removeItem();
-		void expandAllFolders();
-		void collapseAllFolders();
-		void setEventsLog(EventsLog *);
-		void setScenarioControls(ScenarioControls *);
-		/*void AddItemsRecursively(const wxTreeItemId& idParent,
-                                     size_t numChildren,
-                                     size_t depth,
-                                     size_t folder);
-		
-		void AddTestItemsToTree(size_t numChildren,
-                                    size_t depth);*/
-		void displayFirstChild();
-
-
-	private:
-		wxWindow *parent;
-
-		enum
-		{
-			iconFile,
-			iconFolderClosed,
-			iconFolderOpened,
-			addNewItemID,
-			addNewFolderID,
-			administerItemID,
-			removeItemID,
-		};
-
-		wxImageList *imageList;
-		wxClientData *data;
-		wxTreeItemId item;
-		EventsLog *eventsLog;
-		ScenarioControls *sctrl;
-		wxTreeListCtrl *list;
-		wxTreeCtrl *m_treeCtrl;
-
-		void onAddItem(wxCommandEvent& WXUNUSED(event));
-		void InitImageList();
-
-		DECLARE_EVENT_TABLE()
-
+		iconFile,
+		iconFolderClosed,
+		iconFolderOpened,
+		addNewItemID,
+		addNewFolderID,
+		administerItemID,
+		removeItemID,
 	};
 
-	class eventsListItemData : public wxTreeItemData
-	{
-	public:
-		eventsListItemData(const wxString& data) : localData(data) { }
+	wxImageList *imageList;
+	wxClientData *data;
+	wxTreeItemId item;
+	EventsLog *eventsLog;
+	ScenarioControls *sctrl;
+	wxTreeListCtrl *list;
 
-		const wxString GetLocalData() { return localData; }
+	void onAddItem(wxCommandEvent& WXUNUSED(event));
+	void InitImageList();
 
-	private:
-		wxString localData;
-	};
+	DECLARE_EVENT_TABLE()
 
-//}
+};
+
+//jma342--this class is used to store data for each of the elements of a tree
+//this either stores a file or folder as local data
+class eventsListItemData : public wxTreeItemData
+{
+public:
+
+	//jma342--initialises the local variable localdata
+	eventsListItemData(const wxString& data) : localData(data) { }
+
+	//jma342--returns the variable localdata
+	const wxString GetLocalData() { return localData; }
+
+private:
+	wxString localData;
+};
 
 #endif

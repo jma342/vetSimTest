@@ -5,63 +5,59 @@
 #ifndef SCENARIOCONTROLS_H
 #define SCENARIOCONTROLS_H
 
-//namespace vetSimulatorUI
-//{
-	class ScenarioControls : public MyScrolledWindowSmart
-	{
-	public:
-		ScenarioControls(wxWindow *parent);
+
+class ScenarioControls : public MyScrolledWindowSmart
+{
+public:
+	ScenarioControls(wxWindow *parent);
+
+	long getMilliSecondsElapsed();
+	void setEventsLog(EventsLog *);
+
+private:
 		
+	wxButton *play;
+	wxButton *start;
+	wxButton *stop;
+	wxButton *ffwd;
+	wxButton *pause;
+	wxButton *dbrief;
+	wxRichTextCtrl *time;
+	wxRichTextCtrl *time_label;
+	wxRichTextCtrl *scenarioTitle;
+	wxRichTextCtrl *scenarioTitle_label;
+	wxRichTextCtrl *frameTitle;
+	wxRichTextCtrl *frameTitle_label;
+	wxRichTextCtrl *timeInScenario;
+	wxRichTextCtrl *timeInScenario_label;
+	wxRichTextCtrl *timeInframe;
+	wxRichTextCtrl *timeInframe_label;
+	wxRichTextCtrl *patientTime;
+	wxRichTextCtrl *patientTime_label;
 
-		//virtual void OnDraw(wxDC& dc);
+	EventsLog *eventsLog;
 
-		long getMilliSecondsElapsed();
-		void setEventsLog(EventsLog *);
+	wxTimer *scenarioTimer;
+	wxTimer *frameTimer;
+	wxTimer *patientTimer;
 
-	private:
-		
-		wxButton *play;
-		wxButton *start;
-		wxButton *stop;
-		wxButton *ffwd;
-		wxButton *pause;
-		wxButton *dbrief;
-		wxRichTextCtrl *time;
-		wxRichTextCtrl *time_label;
-		wxRichTextCtrl *scenarioTitle;
-		wxRichTextCtrl *scenarioTitle_label;
-		wxRichTextCtrl *frameTitle;
-		wxRichTextCtrl *frameTitle_label;
-		wxRichTextCtrl *timeInScenario;
-		wxRichTextCtrl *timeInScenario_label;
-		wxRichTextCtrl *timeInframe;
-		wxRichTextCtrl *timeInframe_label;
-		wxRichTextCtrl *patientTime;
-		wxRichTextCtrl *patientTime_label;
+	long milliSecondsElapsed;
 
-		EventsLog *eventsLog;
+	boolean scenarioPlaying;
+	boolean scenarioPaused;
+	boolean scenarioFastFwd;
 
-		wxTimer *scenarioTimer;
-		wxTimer *frameTimer;
-		wxTimer *patientTimer;
-
-		long milliSecondsElapsed;
-
-		boolean scenarioPlaying;
-		boolean scenarioPaused;
-		boolean scenarioFastFwd;
-
-		void onStartScenarioButton(wxCommandEvent& event);
-		void onPlayButton(wxCommandEvent& event);
-		void onPauseButton(wxCommandEvent& event);
-		void onStopButton(wxCommandEvent& event);
-		void onFastForwardButton(wxCommandEvent& event);
-		void OnDebriefButton(wxCommandEvent& event);
-		void onTimer(wxTimerEvent& event);
+	void onStartScenarioButton(wxCommandEvent& event);
+	void onPlayButton(wxCommandEvent& event);
+	void onPauseButton(wxCommandEvent& event);
+	void onStopButton(wxCommandEvent& event);
+	void onFastForwardButton(wxCommandEvent& event);
+	void OnDebriefButton(wxCommandEvent& event);
+	void onTimer(wxTimerEvent& event);
 
 
-		DECLARE_EVENT_TABLE()
-	};
-//}
+	DECLARE_EVENT_TABLE()
+};
+
 
 #endif
