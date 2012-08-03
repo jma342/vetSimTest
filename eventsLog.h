@@ -1,4 +1,4 @@
-#include "auidemo.h"
+#include "mainApplicationWindow.h"
 #include "wx/grid.h"
 
 #ifndef EVENTSLOG_H

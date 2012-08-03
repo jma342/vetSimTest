@@ -1,4 +1,4 @@
-#include "auidemo.h"
+#include "mainApplicationWindow.h"
 #include "wx\wfstream.h"
 
 const int DEFAULT_SCREEN_MODE = 0;
@@ -188,6 +188,9 @@ MyFrame::MyFrame(wxWindow* parent,
 
 }
 
+//jma342--sets the initial screen layout which will remain
+//if the preset default layout isn't successfully loaded on application
+//startup
 void MyFrame::InitialScreenLayout()
 {
 	/*eventsList and eventsLog*/
@@ -258,6 +261,12 @@ void MyFrame::InitialScreenLayout()
 	subScreensBar->ToggleTool(ID_eventsList,true);
 	subScreensBar->ToggleTool(ID_scenarioControls,true);
 
+	 mainWindow.AddPane(subScreensBar, wxAuiPaneInfo().
+                  Name(wxT("SubScreensBar")).Caption(wxT("SubScreens Toolbar")).
+                  ToolbarPane().Top());
+	 /*subscreens toolbar*/
+
+	 /*overwrite preset layout toolbar*/
 	adminOverWritePresetLayoutBar = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize,
                                          wxAUI_TB_DEFAULT_STYLE |
                                          wxAUI_TB_TEXT |
@@ -267,21 +276,20 @@ void MyFrame::InitialScreenLayout()
 
     adminOverWritePresetLayoutBar->AddTool(ID_adminOverwritePresetLayouts, wxT("Overwrite Preset Layouts"),adminOverWritePresetLayoutBar_bmp1,wxT("Overwrite Preset Layouts"),wxITEM_CHECK);
 	
+	/*drop down box in overwrite preset layout toolbar*/
     layoutChoice = new wxChoice(adminOverWritePresetLayoutBar,ID_adminOverwritePresetLayouts_choice);
 
     layoutChoice->AppendString(wxT("Default Layout"));
     layoutChoice->AppendString(wxT("Manual Mode"));
 	layoutChoice->AppendString(wxT("PreProgrammed Mode"));
     adminOverWritePresetLayoutBar->AddControl(layoutChoice);
-
-    mainWindow.AddPane(subScreensBar, wxAuiPaneInfo().
-                  Name(wxT("SubScreensBar")).Caption(wxT("SubScreens Toolbar")).
-                  ToolbarPane().Top());
+	/*drop down box in overwrite preset layout toolbar*/
+   
 
 	mainWindow.AddPane(adminOverWritePresetLayoutBar, wxAuiPaneInfo().
                   Name(wxT("OverwritePresetLayoutBar")).Caption(wxT("Preset Layout Toolbar")).
                   ToolbarPane().Top());
-	/*subscreens toolbar*/
+	 /*overwrite preset layout toolbar*/
 
 	//create the eventsList popup menu
 	menuPopup_EventsList = new wxMenu;
@@ -705,38 +713,6 @@ void MyFrame::onExpandAllEventsLists(wxCommandEvent& WXUNUSED(event))
 	}
 }
 
-////jma342--this is triggered when the expand all events list menu option is executed
-////this expands all of the folders in each of the eventst lists
-//void MyFrame::toggleEventsList()
-//{
-//	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Misc))
-//	{
-//		mainWindow.GetPane("eventsList_Misc").Show();	
-//	}
-//	else
-//	{
-//		mainWindow.GetPane("eventsList_Misc").Hide();
-//	}
-//
-//	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Med))
-//	{
-//		mainWindow.GetPane("eventsList_Med").Show();	
-//	}
-//	else
-//	{
-//		mainWindow.GetPane("eventsList_Med").Hide();
-//	}
-//
-//	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Misc))
-//	{
-//		mainWindow.GetPane("eventsList_ABC").Show();	
-//	}
-//	else
-//	{
-//		mainWindow.GetPane("eventsList_ABC").Hide();
-//	}
-//}
-
 //jma342--this is triggered when the scenario controls button is executed
 void MyFrame::onScenarioControls(wxCommandEvent& WXUNUSED(event))
 {
@@ -1099,10 +1075,6 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 			fileName = saveFileDialog.GetPath();
 		}
 	}
-	/*else
-	{
-		fileName = saveFileDialog.GetPath();
-	}*/
 
 	long choice = -1;
 
@@ -1321,13 +1293,14 @@ void MyFrame::loadCustomLayoutWithScreenSettings()
         openFileDialog(this, _("Load Screen Layout"), "", "",
                         "Screen Layouts (*.txt)|*.txt", wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 
+	//execute if user choose to cancel open file operation
     if (openFileDialog.ShowModal() == wxID_CANCEL)
-        return;     // the user changed idea...
+        return;
         
-    // proceed loading the file chosen by the user;
-    // this can be done with e.g. wxWidgets input streams:
+	//intialises the input stream
     wxFileInputStream input_stream(openFileDialog.GetPath());
 
+	//executes if the input stream wasn't initialised successfully
     if (!input_stream.IsOk())
     {
         wxMessageBox("Cannot open file '%s'.", openFileDialog.GetPath());
@@ -1336,28 +1309,46 @@ void MyFrame::loadCustomLayoutWithScreenSettings()
 
 	wxString perspective = "";
 
+	//wratps the input stream in a text input stream
 	wxTextInputStream in(input_stream);
+
+	//reads the layout from the file
 	perspective = in.ReadLine();
 
+	//loads the layout read from the file
 	mainWindow.LoadPerspective(perspective);
+
+	//sets the subscreens tool bar to relflect
+	//the panes on screen
 	setSubScreensOnToolBar();
 
+	//updates the screen to display the loaded layout
 	mainWindow.Update();
 
+	//creates and compiles a regular expression used
+	//to extract the screen settings from the read layout file
 	wxRegEx extractDimensions("_[0-9]+_[0-9]+");
 
 	wxString match;
 
+	//executes if a match is found for the regular expression
 	if(extractDimensions.Matches(openFileDialog.GetFilename()))
 	{
+		//captures the string that matched the regular expression
 		match = extractDimensions.GetMatch(openFileDialog.GetFilename());
 
+		//removes the first underscore
 		wxString extractEachDimension = match.substr(1,match.Length());
 
+		//extracts the width screen setting which precedes the remaining underscore
 		customLayoutNativeScreenWidth = atoi(extractEachDimension.substr(0,extractEachDimension.Find('_')));
+
+		///extracts the height screen setting which succeeds the remaining underscore
 		customLayoutNativeScreenHeight = atoi(extractEachDimension.substr(extractEachDimension.Find('_') + 1,extractEachDimension.Find('_') + 1 - extractEachDimension.Length()));	
 	
 	}
+	//if the loaded filename doesn't have any screen settings
+	//the current screen settings are associated with the loaded custom layout
 	else
 	{
 		customLayoutNativeScreenWidth = wxSystemSettings::GetMetric(wxSYS_SCREEN_X);
@@ -1365,6 +1356,8 @@ void MyFrame::loadCustomLayoutWithScreenSettings()
 
 	}
 
+	//the screen settings for the loaded screen layout don't match the current screen settings
+	//the loaded layout is adjusted to best fit the current screen settings
 	if(customLayoutNativeScreenWidth!= wxSystemSettings::GetMetric(wxSYS_SCREEN_X) || 
 		customLayoutNativeScreenHeight!= wxSystemSettings::GetMetric(wxSYS_SCREEN_Y))
 	{
@@ -1373,29 +1366,35 @@ void MyFrame::loadCustomLayoutWithScreenSettings()
 	
 }
 
+//jma342--this is triggered when the drop down arrow on the eventsList 
+//toolbar button is executed
 void MyFrame::OnDropDownToolbarItem_eventsList(wxAuiToolBarEvent& evt)
 {
     if (evt.IsDropDownClicked())
     {
+		//type casts the object which triggered the event to that of the tool bar
         wxAuiToolBar* tb = static_cast<wxAuiToolBar*>(evt.GetEventObject());
 
+		//toggles the events list button to true
         tb->ToggleTool(ID_eventsList, true);
 
-        // line up our menu with the button
+        //aligns the menu with the button
         wxRect rect = tb->GetToolRect(evt.GetId());
         wxPoint pt = tb->ClientToScreen(rect.GetBottomLeft());
         pt = ScreenToClient(pt);
 
+		//displays the pop up menu at point on screen gathered above
         PopupMenu(menuPopup_EventsList, pt);
 
+		//toggles the events list toolbar button off
+		//if none of the events lists are on screen
 		if(!menuPopup_EventsList->IsChecked(ID_eventsList_ABC) && !menuPopup_EventsList->IsChecked(ID_eventsList_Med) && 
 			!menuPopup_EventsList->IsChecked(ID_eventsList_Misc))
 		{
-			//wxMessageBox("here");
-			// make sure the button is "un-stuck"
 			tb->ToggleTool(ID_eventsList, false);
 		}
 
+		//updates the screen to reflect any changes
 		mainWindow.Update();
 
     }
@@ -1485,7 +1484,8 @@ void MyFrame::onAbout(wxCommandEvent& WXUNUSED(event))
 		("About Hello World"), wxOK | wxICON_INFORMATION,this);
 }
 
-
+//jma342--this is triggered once any pany is closed/hidden...the corresponding
+//panes toolbar button is toggled off or menu option is unchecked
 void MyFrame::OnPaneClose(wxAuiManagerEvent& evt)
 {
 	if(evt.pane->name == "mannequin")
@@ -1525,12 +1525,16 @@ void MyFrame::OnPaneClose(wxAuiManagerEvent& evt)
 			subScreensBar->ToggleTool(ID_eventsList,false);
 	}
 
+	//executes if the pane being closed was at maximum size while being closed
 	if(evt.GetPane()->IsMaximized())
 	{
+		//relaods the layout prior to the pane(window/screen) being maximized
 		mainWindow.LoadPerspective(currentPerspective,true);
 
 		//on maximization of these panes the corresponding menu for eventslist is disabled
-		//on minimzation the menu options are enabled
+		//on minimzation the menu options are enabled...the reason for this is because if a pane 
+		//was unchecked to indicate it was hidden while it was maximized, it would remain on 
+		//screen still maximized and unmovable unless the layout was reset or changed
 		if(evt.GetPane()->name == "eventsList_ABC" || evt.GetPane()->name == "eventsList_Misc" || evt.GetPane()->name == "eventsList_Med")
 		{
 			this->menuPopup_EventsList->Enable(ID_eventsList_ABC,true);
@@ -1540,17 +1544,23 @@ void MyFrame::OnPaneClose(wxAuiManagerEvent& evt)
 			this->menuPopup_EventsList->Enable(ID_eventsList_HideAll,true);
 		}
 	}
-
 }
 
+//jma342--this is triggered once any pane is maximized
 void MyFrame::onPaneMaximize(wxAuiManagerEvent& evt)
 {
+	//captures the current layout which will be restored 
+	//once the screen is minimized or closed while maximized
 	currentPerspective = mainWindow.SavePerspective();
 
-	evt.GetPane()->Floatable(false);//prevents the pane from becoming floatable when maximized due to 
-									//the window becoming unmovable if the pane(eventslists) is unchecked
-									//from the events list
+	//prevents the pane from becoming floatable(undocked) when maximized due to 
+	//the window becoming unmovable as it remains maximized
+	evt.GetPane()->Floatable(false);
 
+	//on maximization of these panes the corresponding menu for eventslist is disabled
+	//on minimzation the menu options are enabled...the reason for this is because if a pane 
+	//was unchecked to indicate it was hidden while it was maximized, it would remain on 
+	//screen still maximized and unmovable unless the layout was reset or changed
 	if(evt.GetPane()->name == "eventsList_ABC" || evt.GetPane()->name == "eventsList_Misc" || evt.GetPane()->name == "eventsList_Med")
 	{
 		this->menuPopup_EventsList->Enable(ID_eventsList_ABC,false);
@@ -1560,17 +1570,23 @@ void MyFrame::onPaneMaximize(wxAuiManagerEvent& evt)
 		this->menuPopup_EventsList->Enable(ID_eventsList_HideAll,false);
 	}
 
+	//updates the screen to reflect the changes to the layout
 	mainWindow.Update();
 }
 
+//jma342--this is triggered once any pane is restored...this is used
+//to capture restoration after minimization from being maximized
 void MyFrame::onRestorePane(wxAuiManagerEvent& evt)
 {
 	if(evt.GetPane()->IsMaximized())
 	{
+		//loads the layout captured prior to being maximized
 		mainWindow.LoadPerspective(currentPerspective,true);
 
 		//on maximization of these panes the corresponding menu for eventslist is disabled
-		//on minimzation the menu options are enabled
+		//on minimzation the menu options are enabled...the reason for this is because if a pane 
+		//was unchecked to indicate it was hidden while it was maximized, it would remain on 
+		//screen still maximized and unmovable unless the layout was reset or changed
 		if(evt.GetPane()->name == "eventsList_ABC" || evt.GetPane()->name == "eventsList_Misc" || evt.GetPane()->name == "eventsList_Med")
 		{
 			this->menuPopup_EventsList->Enable(ID_eventsList_ABC,true);

@@ -1,6 +1,6 @@
 // For compilers that support precompilation, includes "wx/wx.h".
-#ifndef AUIDEMO_H
-#define AUIDEMO_H
+#ifndef MAINAPPLICATIONWINDOW_H
+#define MAINAPPLICATIONWINDOW_H
 
 #include "wx/wxprec.h"
 
