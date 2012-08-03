@@ -448,6 +448,7 @@ void MyFrame::onPreProgrammedMode(wxCommandEvent& WXUNUSED(event))
 //jma342--sets the subscreens toolbar to indicate which panes are active
 void MyFrame::setSubScreensOnToolBar()
 {
+	//mannequin
 	if(this->mannequin->IsShown())
 	{
 		subScreensBar->ToggleTool(ID_mannequin,true);
@@ -457,6 +458,7 @@ void MyFrame::setSubScreensOnToolBar()
 		subScreensBar->ToggleTool(ID_mannequin,false);
 	}
 
+	//instructor patient monitor
 	if(this->instructorPatientMonitor->IsShown())
 	{
 		subScreensBar->ToggleTool(ID_instructorPatientMonitor,true);
@@ -466,6 +468,7 @@ void MyFrame::setSubScreensOnToolBar()
 		subScreensBar->ToggleTool(ID_instructorPatientMonitor,false);
 	}
 
+	//eventslog
 	if(this->eventsLog->IsShown())
 	{
 		subScreensBar->ToggleTool(ID_eventsLog,true);
@@ -475,6 +478,7 @@ void MyFrame::setSubScreensOnToolBar()
 		subScreensBar->ToggleTool(ID_eventsLog,false);
 	}
 
+	//scenario controls
 	if(this->scenarioControls->IsShown())
 	{
 		subScreensBar->ToggleTool(ID_scenarioControls,true);
@@ -484,6 +488,7 @@ void MyFrame::setSubScreensOnToolBar()
 		subScreensBar->ToggleTool(ID_scenarioControls,false);
 	}
 
+	//eventslist_ABC
 	if(this->eventsList_ABC->IsShown())
 	{
 		menuPopup_EventsList->Check(ID_eventsList_ABC,true);
@@ -493,6 +498,7 @@ void MyFrame::setSubScreensOnToolBar()
 		menuPopup_EventsList->Check(ID_eventsList_ABC,false);
 	}
 
+	//eventslist_Med
 	if(this->eventsList_Med->IsShown())
 	{
 		menuPopup_EventsList->Check(ID_eventsList_Med,true);
@@ -502,6 +508,7 @@ void MyFrame::setSubScreensOnToolBar()
 		menuPopup_EventsList->Check(ID_eventsList_Med,false);
 	}
 
+	//eventslist_Misc
 	if(this->eventsList_Misc->IsShown())
 	{
 		menuPopup_EventsList->Check(ID_eventsList_Misc,true);
@@ -511,6 +518,7 @@ void MyFrame::setSubScreensOnToolBar()
 		menuPopup_EventsList->Check(ID_eventsList_Misc,false);
 	}
 
+	//toggles the main button for all of the events lists
 	if(this->eventsList_ABC->IsShown() || this->eventsList_Med->IsShown() || this->eventsList_Misc->IsShown())
 	{
 		subScreensBar->ToggleTool(ID_eventsList,true);
@@ -545,12 +553,15 @@ void MyFrame::toggleMannequin()
 
 }
 
+//jma342--this is triggered when the instructorPatient monitor button is executed
 void MyFrame::onInstructorPatientMonitor(wxCommandEvent& WXUNUSED(event))
 {
 	toggleInstructorPatientMonitor();
 	mainWindow.Update();
 }
 
+//jma342--displays or hides the instructor/patient monitor window/pane depending on the toggle position of the 
+//instructor/patient monitor toolbar button
 void MyFrame::toggleInstructorPatientMonitor()
 {
 	if(subScreensBar->GetToolToggled(ID_instructorPatientMonitor))
@@ -566,15 +577,17 @@ void MyFrame::toggleInstructorPatientMonitor()
 
 }
 
+//jma342--this is triggered when the events log button is executed
 void MyFrame::onEventsLog(wxCommandEvent& WXUNUSED(event))
 {
 	toggleEventsLog();
 	mainWindow.Update();
 }
 
+//jma342--displays or hides the events log window/pane depending on the toggle position of the 
+//events log toolbar button
 void MyFrame::toggleEventsLog()
 {
-	//if(this->menuBar->IsChecked(ID_eventsLog))
 	if(subScreensBar->GetToolToggled(ID_eventsLog))
 	{
 		mainWindow.GetPane("eventsLog").Show();			
@@ -586,9 +599,11 @@ void MyFrame::toggleEventsLog()
 
 }
 
+//jma342--this is triggered when the eventsList_ABC button is executed
 void MyFrame::onEventsList_ABC(wxCommandEvent& WXUNUSED(event))
 {
-
+	//eventsList_ABC button is checked the eventsList ABC pane is displayed
+	//otherwise it is hidden
 	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_ABC))
 	{
 		mainWindow.GetPane("eventsList_ABC").Show();	
@@ -598,12 +613,13 @@ void MyFrame::onEventsList_ABC(wxCommandEvent& WXUNUSED(event))
 		mainWindow.GetPane("eventsList_ABC").Hide();
 	}
 
-	//mainWindow.Update();
 }
 
+//jma342--this is triggered when the eventsList_Med button is executed
 void MyFrame::onEventsList_Med(wxCommandEvent& WXUNUSED(event))
 {
-
+	//eventsList_Med button is checked the eventsList_Med pane is displayed
+	//otherwise it is hidden
 	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Med))
 	{
 		mainWindow.GetPane("eventsList_Med").Show();	
@@ -612,13 +628,13 @@ void MyFrame::onEventsList_Med(wxCommandEvent& WXUNUSED(event))
 	{
 		mainWindow.GetPane("eventsList_Med").Hide();
 	}
-
-	//mainWindow.Update();
 }
 
+//jma342--this is triggered when the eventsList_Misc button is executed
 void MyFrame::onEventsList_Misc(wxCommandEvent& WXUNUSED(event))
 {
-
+	//eventsList_Misc button is checked the eventsList_Misc pane is displayed
+	//otherwise it is hidden
 	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Misc))
 	{
 		mainWindow.GetPane("eventsList_Misc").Show();	
@@ -627,48 +643,50 @@ void MyFrame::onEventsList_Misc(wxCommandEvent& WXUNUSED(event))
 	{
 		mainWindow.GetPane("eventsList_Misc").Hide();
 	}
-
-	//mainWindow.Update();
 }
 
+//jma342--this is triggered when the eventsList ShowAll button is executed
 void MyFrame::onEventsList_ShowAll(wxCommandEvent& WXUNUSED(event))
 {
-
-	//toggleEventsList();
-
+	//toggles on the main button for each of the events lists
 	subScreensBar->ToggleTool(ID_eventsList,true);
 
+	//displays all of the eventst lists on screen
 	mainWindow.GetPane("eventsList_ABC").Show();			
 	mainWindow.GetPane("eventsList_Med").Show();
 	mainWindow.GetPane("eventsList_Misc").Show();
 
+	//sets each of the events lists menu options to indicate on screen
 	menuPopup_EventsList->Check(ID_eventsList_ABC,true);
 	menuPopup_EventsList->Check(ID_eventsList_Med,true);
 	menuPopup_EventsList->Check(ID_eventsList_Misc,true);
 
-	//mainWindow.Update();
 }
 
+//jma342--this is triggered when the eventsList HideAll button is executed
 void MyFrame::onEventsList_HideAll(wxCommandEvent& WXUNUSED(event))
 {
-
-	//toggleEventsList();
-
+	//toggles off the main button for each of the events lists
 	subScreensBar->ToggleTool(ID_eventsList,false);
 
+	//removes all of the eventst list from the screen
 	mainWindow.GetPane("eventsList_ABC").Hide();			
 	mainWindow.GetPane("eventsList_Med").Hide();
 	mainWindow.GetPane("eventsList_Misc").Hide();
 
+	//sets each of the events lists menu options to off screen
 	menuPopup_EventsList->Check(ID_eventsList_ABC,false);
 	menuPopup_EventsList->Check(ID_eventsList_Med,false);
 	menuPopup_EventsList->Check(ID_eventsList_Misc,false);
 
-	//mainWindow.Update();
 }
 
+//jma342--this is triggered when the expand all events list menu option is executed
+//this expands all of the folders in each of the eventst lists
 void MyFrame::onExpandAllEventsLists(wxCommandEvent& WXUNUSED(event))
 {
+	//if the expand all events lists menu option is chosen all of the folders
+	//in each of the events lists are expanded
 	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Expand_All_Folders))
 	{
 
@@ -676,6 +694,9 @@ void MyFrame::onExpandAllEventsLists(wxCommandEvent& WXUNUSED(event))
 		((EventsList*)eventsList_Misc)->expandAllFolders();
 		((EventsList*)eventsList_Med)->expandAllFolders();
 	}
+
+	//if the expand all events lists menu option is not chosen all of the folders
+	//in each of the events lists are collapsed
 	else
 	{
 		((EventsList*)eventsList_ABC)->collapseAllFolders();
@@ -684,46 +705,49 @@ void MyFrame::onExpandAllEventsLists(wxCommandEvent& WXUNUSED(event))
 	}
 }
 
-void MyFrame::toggleEventsList()
-{
-	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Misc))
-	{
-		mainWindow.GetPane("eventsList_Misc").Show();	
-	}
-	else
-	{
-		mainWindow.GetPane("eventsList_Misc").Hide();
-	}
+////jma342--this is triggered when the expand all events list menu option is executed
+////this expands all of the folders in each of the eventst lists
+//void MyFrame::toggleEventsList()
+//{
+//	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Misc))
+//	{
+//		mainWindow.GetPane("eventsList_Misc").Show();	
+//	}
+//	else
+//	{
+//		mainWindow.GetPane("eventsList_Misc").Hide();
+//	}
+//
+//	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Med))
+//	{
+//		mainWindow.GetPane("eventsList_Med").Show();	
+//	}
+//	else
+//	{
+//		mainWindow.GetPane("eventsList_Med").Hide();
+//	}
+//
+//	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Misc))
+//	{
+//		mainWindow.GetPane("eventsList_ABC").Show();	
+//	}
+//	else
+//	{
+//		mainWindow.GetPane("eventsList_ABC").Hide();
+//	}
+//}
 
-	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Med))
-	{
-		mainWindow.GetPane("eventsList_Med").Show();	
-	}
-	else
-	{
-		mainWindow.GetPane("eventsList_Med").Hide();
-	}
-
-	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Misc))
-	{
-		mainWindow.GetPane("eventsList_ABC").Show();	
-	}
-	else
-	{
-		mainWindow.GetPane("eventsList_ABC").Hide();
-	}
-
-}
-
+//jma342--this is triggered when the scenario controls button is executed
 void MyFrame::onScenarioControls(wxCommandEvent& WXUNUSED(event))
 {
 	toggleScenarioControls();
 	mainWindow.Update();
 }
 
+//jma342--displays or hides the scenario controls window/pane depending on the toggle position of the 
+//scenarion controls toolbar button
 void MyFrame::toggleScenarioControls()
 {
-	//if(this->menuBar->IsChecked(ID_scenarioControls))
 	if(subScreensBar->GetToolToggled(ID_scenarioControls))
 	{
 		mainWindow.GetPane("scenarioControls").Show();			
@@ -736,10 +760,13 @@ void MyFrame::toggleScenarioControls()
 
 }
 
+//jma342--this is triggered when the overwrite presetlayout toolbar button is executed
 void MyFrame::onOverwritePresetLayout(wxCommandEvent& WXUNUSED(event))
 {
+	//caputres the string representation of the layout option chosen
 	wxString chosenPresetLayout = this->layoutChoice->GetString(this->layoutChoice->GetSelection());
 
+	//executes only if an option is chosen
 	if(chosenPresetLayout.Length() > 0)
 	{
 		 wxMessageDialog dialog(this,
@@ -749,6 +776,7 @@ void MyFrame::onOverwritePresetLayout(wxCommandEvent& WXUNUSED(event))
 							   wxYES_NO | wxICON_QUESTION);
 
 
+		 //displays the above message dialog in modal state
 		switch ( dialog.ShowModal() )
 		{
 			case wxID_YES:
@@ -760,23 +788,24 @@ void MyFrame::onOverwritePresetLayout(wxCommandEvent& WXUNUSED(event))
 				break;
 
 			default:
-				wxLogError(wxT("Unexpected wxMessageDialog return code!"));
+				wxMessageBox("Unexpected option!");
 		}
 	
 	}
 
+	//toggles the overwrite preset layout button off after the operation is complete
 	this->adminOverWritePresetLayoutBar->ToggleTool(ID_adminOverwritePresetLayouts,false);
 	mainWindow.Update();
 	
 }
 
+//jma342--this is triggered when the overwrite presetlayout toolbar button is executed
 void MyFrame::overWritePresetLayout(int chosenPresetLayout)
 {        
 	wxString filePathLayout;
 	wxString filePathNativeScreen;
-    // save the current contents in the file;
-    // this can be done with e.g. wxWidgets output streams:
 
+	//creates preset layouts folder if it doesn't exist
 	if(!wxDir::Exists("PresetLayouts"))
 	{
 		wxDir::Make("PresetLayouts");
@@ -784,6 +813,7 @@ void MyFrame::overWritePresetLayout(int chosenPresetLayout)
 
 	int layoutID = -1;
 
+	//sets the paths for the layouts and their corresponding screen settings
 	if(chosenPresetLayout == DEFAULT_SCREEN_MODE)
 	{
 		filePathLayout = "defaultLayout.txt";
@@ -824,17 +854,20 @@ void MyFrame::overWritePresetLayout(int chosenPresetLayout)
 		
 	outputNativeScreen.Close();
 
-	
+	//store the current screen settings for the chosen preset layout
 	presetLayoutsNativeScreenWidth[chosenPresetLayout] = wxSystemSettings::GetMetric(wxSYS_SCREEN_X);
 	presetLayoutsNativeScreenHeight[chosenPresetLayout] = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
 
+	//if the menu option for the current layout was disabled it is enables
+	//this option would have been disabled if on start up of the application
+	//no layout was loaded for it due to the requisite file not being found
 	if(!this->menuBar->IsEnabled(layoutID))
 	{	
 		this->menuBar->Enable(layoutID,true);
 	}
-	
 }
 
+//jma342--this is triggered when the application is started. It loads all of the preset layouts that are stored to file
 void MyFrame::loadAllPresetLayouts()
 {
 	wxString presetLayoutFiles[] = {"defaultLayout.txt","manualMode.txt","preProgrammedMode.txt"};
@@ -842,10 +875,10 @@ void MyFrame::loadAllPresetLayouts()
 	wxString failedLayouts = "";
 	int layoutsFailed = 1;
 
+	//loops through each of the preset layout files
 	for(int count = 0; count < 3;count++)
 	{
-		// proceed loading the file chosen by the user;
-		// this can be done with e.g. wxWidgets input streams:
+		//builds the file paths for each of the preset layouts
 		wxString layoutFilePath = "PresetLayouts\\"+presetLayoutFiles[count];
 		wxString nativeScreenfilePath = "PresetLayouts\\"+presetLayoutNativeScreenFiles[count];
 
@@ -853,20 +886,27 @@ void MyFrame::loadAllPresetLayouts()
 
 		layoutsFailed_str.Printf("%d",layoutsFailed);
 
-		if (!wxFile::Exists(layoutFilePath)/*!layoutInputStream.IsOk()*/)
+		//executes if the build layout file path doesn't exist
+		if (!wxFile::Exists(layoutFilePath))
 		{
-			//wxMessageBox("Cannot open file '%s'.", filePath);
+			//if any of the layout file paths built for a layout mode
+			//don't exist their corresponding menu option is disabled
 
+			//default mode
 			if(count == 0)
 			{
 				this->menuScreenLayout->Enable(ID_DefaultMode,false);
 				failedLayouts = "\n " + layoutsFailed_str + ". " + presetLayoutFiles[count];
 			}
+
+			//manual mode
 			else if (count == 1)
 			{
 				this->menuScreenLayout->Enable(ID_ManualMode,false);
 				failedLayouts += "\n " + layoutsFailed_str + ". " + presetLayoutFiles[count];
 			}
+
+			//preprogrammede mode
 			else if(count == 2)
 			{
 				this->menuScreenLayout->Enable(ID_PreProgrammedMode,false);
@@ -879,14 +919,17 @@ void MyFrame::loadAllPresetLayouts()
 
 		else
 		{
+			//intialises the file input stream
 			wxFileInputStream layoutInputStream(layoutFilePath);
 			wxTextInputStream inLayout(layoutInputStream);
+
+			//reads in the layout from the current file paht
 			presetLayouts[count] = inLayout.ReadLine();
 
 			
-			//if there are no native screen metrics then just use the metrics
-			//for the current screen
-			if(!wxFile::Exists(nativeScreenfilePath)/*!nativeScreenInputStream.IsOk()*/)
+			//if there are no native screen metrics file the metrics
+			//for the current screen are used instead
+			if(!wxFile::Exists(nativeScreenfilePath))
 			{
 				presetLayoutsNativeScreenWidth[count] = wxSystemSettings::GetMetric(wxSYS_SCREEN_X);
 				presetLayoutsNativeScreenHeight[count] = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
@@ -895,14 +938,16 @@ void MyFrame::loadAllPresetLayouts()
 			{
 				wxFileInputStream nativeScreenInputStream(nativeScreenfilePath);
 				wxTextInputStream inLayoutNativeScreen(nativeScreenInputStream);
+
+				//reads the metrics from the metric file for the current layout
 				presetLayoutsNativeScreenWidth[count] = (int)inLayoutNativeScreen.ReadDouble();
-				//inLayoutNativeScreen.ReadLine();
 				presetLayoutsNativeScreenHeight[count] = (int)inLayoutNativeScreen.ReadDouble();
 			}
-			//perspective = in.ReadLine();
 		}
 	}
 
+	//if any of the layout files failed to load they would be displayed in the following
+	//message box
 	if(failedLayouts.length() > 0)
 	{
 		wxMessageBox("The following preset layouts failed to load: \n " + failedLayouts + 
@@ -911,9 +956,11 @@ void MyFrame::loadAllPresetLayouts()
 	}
 }
 
-
+//jma342--this function is triggered when the save custom layout is executed
 void MyFrame::onSaveCustomLayout(wxCommandEvent& WXUNUSED(event))
 {
+	//executes if the applicatin is set to save custom layouts with screen 
+	//settings..this is set at the beggining of this .cpp file 
 	if(SAVE_CUSTOM_LAYOUTS_WITH_SCREEN_SETTINGS)
 	{
 		saveCustomLayoutWithScreenSettings();
@@ -924,41 +971,51 @@ void MyFrame::onSaveCustomLayout(wxCommandEvent& WXUNUSED(event))
 	}	
 }
 
+//jma342--this function saves custom layouts with no regard for the
+//screen settings under which the custom layout is saved
 void MyFrame::saveCustomLayoutWithOUTScreenSettings()
 {
 		wxFileDialog 
             saveFileDialog(this, _("Save Screen Layout"), "", "",
                            "Screen Layout files (*.txt)|*.txt", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
+	//executes if the user chooses to cancel file dialog
     if (saveFileDialog.ShowModal() == wxID_CANCEL)
-        return;     // the user changed idea...
+        return;
         
 	
-    // save the current contents in the file;
+    //intialise the output streem
 	wxFileOutputStream output_stream(saveFileDialog.GetPath());
 
+	//if the output stream isn't successfully initialised
     if (!output_stream.IsOk())
     {
         wxMessageBox("Cannot save current contents in file '%s'.", saveFileDialog.GetPath());
         return;
     }
 
-		
+	//wraps the output stream in a text output stream
 	wxTextOutputStream out(output_stream);
+
+	//saves the current screen layout to file
 	out.WriteString(mainWindow.SavePerspective());
 		
+	//closes the output stream
 	output_stream.Close();
 
 }
 
+//jma342--this function saves custom layouts with regard for the
+//screen settings under which the custom layout is saved
 void MyFrame::saveCustomLayoutWithScreenSettings()
 {
 	wxFileDialog 
             saveFileDialog(this, _("Save Screen Layout"), "", "",
                            "Screen Layout files (*.txt)|*.txt", wxFD_SAVE);
 
+	//executes if the user chooses to cancel file dialog
     if (saveFileDialog.ShowModal() == wxID_CANCEL)
-        return;     // the user changed idea...
+        return;
     
 	//prevents users from entering underscores into filenames that are new
 	//the system uses underscores to extract the screen settings under which the layout was created
@@ -968,9 +1025,11 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 		return;
 	}
 
+	//creates and compiles regular expression to extract
+	//the screen settings from the filename that the layout is being saved
+	//to granted the filename already exists(is not new)
 	wxRegEx extractDimensions("_[0-9]+_[0-9]+");
 
-	//extractDimensions.GetMatch(openFileDialog.GetPath());
 	wxString fileName;
 	wxString match;
 
@@ -984,29 +1043,34 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 		wxString name;
 		wxString ext;
 
+		//splits the file into the path, name and extension
 		wxFileName::SplitPath(saveFileDialog.GetPath(),&path,&name,&ext);
 
+		//inserts the screen settings into the insertResolution string
 		insertResolution.Printf("_%d_%d",wxSystemSettings::GetMetric(wxSYS_SCREEN_X), wxSystemSettings::GetMetric(wxSYS_SCREEN_Y));
 
+		//rebuilds the user chosen filename with the inserted screen settings
 		fileName += path + "\\" + name + insertResolution + "." + ext;
 
 	}
 
-	//if the chosen file path consists of screen settings that don't match the existing one
-	//they are updated here
+	//if the chosen file path consists of screen settings
 	else if(extractDimensions.Matches(saveFileDialog.GetFilename()))
 	{
+		//retreives the string matching the regular expression
 		match = extractDimensions.GetMatch(saveFileDialog.GetPath());
 
-		//gets rid of first underscore
+		//gets rid of first underscore to leave #_# which leaves 
+		//each of the screen settings(width/height) on either side of the remaining underscore
 		wxString extractEachDimension = match.substr(1,match.Length());
 
+		//extracts the width of the screen setting which precedes the remaining underscore
 		int width = atoi(extractEachDimension.substr(0,extractEachDimension.Find('_')));
-		int height = atoi(extractEachDimension.substr(extractEachDimension.Find('_') + 1,extractEachDimension.Find('_') + 1 - extractEachDimension.Length()));	
 
-		//extracts the width and height values of the chosen file path
+		//extracts the height of the screen setting which succeeds the remaining underscore
+		int height = atoi(extractEachDimension.substr(extractEachDimension.Find('_') + 1,extractEachDimension.Find('_') + 1 - extractEachDimension.Length()));	
 		
-		//checks whether screen settings of the chosen file match the current screen settings
+		//executes if the screen settings of the chosen file don't match the current screen settings
 		if(width != wxSystemSettings::GetMetric(wxSYS_SCREEN_X) || height != wxSystemSettings::GetMetric(wxSYS_SCREEN_Y))
 		{
 			wxString insertResolution;
@@ -1014,27 +1078,35 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 			wxString name;
 			wxString ext;
 
+			//splits the file into the path, name and extension
 			wxFileName::SplitPath(saveFileDialog.GetPath(),&path,&name,&ext);
 
+			//removes the screen settings from the current file name as they are being replaced 
+			//with the current screen settings
 			wxString newName = name.substr(0,name.Find('_'));
 
+			//inserts the screen settings into the insertResolution string
 			insertResolution.Printf("_%d_%d",wxSystemSettings::GetMetric(wxSYS_SCREEN_X), wxSystemSettings::GetMetric(wxSYS_SCREEN_Y));
 
+			//rebuilds the user chosen filename with the updated screen settings
 			fileName += path + "\\" + newName + insertResolution + "." + ext;
 		}
+
+		//executes if the chosen file name consists of screen settings that match
+		//the current screen settings
 		else
 		{
 			fileName = saveFileDialog.GetPath();
 		}
 	}
-	else
+	/*else
 	{
 		fileName = saveFileDialog.GetPath();
-	}
+	}*/
 
 	long choice = -1;
 
-	//executes if the user chosen path being written to already exists and
+	//executes if the user chosen path being written to file already exists and
 	//it consists of the dimensions for the current screen setting
 	if(wxFile::Exists(saveFileDialog.GetPath()) && fileName == saveFileDialog.GetPath())
 	{
@@ -1058,7 +1130,7 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 		}
 	}
 
-	//executes if the user path chosen exists but the filename created by the system doesn't
+	//executes if the user path chosen exists but the system adjusted filename doesn't
 	else if(wxFile::Exists(saveFileDialog.GetPath()) && !wxFile::Exists(fileName))
 	{
 		wxString path;
@@ -1068,6 +1140,8 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 		//simply used to extract the name for display in the following dialog
 		wxFileName::SplitPath(fileName,&path,&name,&ext);
 
+		//message dialog displays the options that are available to the user
+		//based on the scenario
 		wxMessageDialog dialog(this,
 			 saveFileDialog.GetFilename() + " already exists.\n\n"
 			"Option 1 - Overwrite " + saveFileDialog.GetFilename() +"\n\n" + 
@@ -1076,6 +1150,7 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 						wxCENTER |
 						wxYES_NO | wxCANCEL | wxICON_QUESTION);
 
+		//changes the labels for the Yes, No and Cancel buttons
 		if ( dialog.SetYesNoCancelLabels
         (
          "Option 1",
@@ -1092,7 +1167,7 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 		}
 
 		//NB-nothing is done here for option 2 as the file that already exists will remain as is and the new file
-		//will be created which is done futher down in the code
+		//will be created which is done further down in the code
 
 		//option 3
 		else if(choice == wxID_CANCEL)
@@ -1101,9 +1176,10 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 			return;
 		}
 	}
+
 	//executes if the user chosen path being written to already exists but
-	//it didn't consist of the current screen dimensions therefore a new filename
-	//was created that is different to the chosen path
+	//it didn't consist of the current screen dimensions therefore a system adjusted filename
+	//is created. However, this system adjusted filename also exists.
 	else if(wxFile::Exists(saveFileDialog.GetPath()) && wxFile::Exists(fileName))
 	{
 		wxString path;
@@ -1113,11 +1189,11 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 		//simply used to extract the name for display in the following dialog
 		wxFileName::SplitPath(fileName,&path,&name,&ext);
 		
-		//it is possible that the path chosen to be overwritten and the
+		//it is possible that the filename chosen to be overwritten and the
 		//system built filename both exist...the user is given the options
 		//of 
-		//1. removing the chosen path and overwriting the system created filename
-		//2. keeping the path and overwriting the system created filename
+		//1. removing the chosen file and overwriting the system created file
+		//2. keeping the chosen file and overwriting the file that conflicts with the system created file
 		//3. cancelling the entire operation and leaving the 2 files untouched
 		wxMessageDialog dialog(this,
 			"Both " + saveFileDialog.GetFilename() + " and " +  name + "." + ext + " exists.\n\n " + 
@@ -1158,24 +1234,35 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 		}
 	}
 
-    // save the current contents in the file;
+    //initialise the output stream
 	wxFileOutputStream output_stream(fileName);
 
+	//executes if the output stream isn't initialised ok
     if (!output_stream.IsOk())
     {
         wxMessageBox("Cannot save current contents in file '%s'.", saveFileDialog.GetPath());
         return;
     }
 
-		
+	//wraps the output stream in a text output stream
 	wxTextOutputStream out(output_stream);
+
+	//saves the custom layout to file
 	out.WriteString(mainWindow.SavePerspective());
 		
+	//closes the output stream
 	output_stream.Close();
 }
 
+//jma342--this function loads custom layouts with no regard for the
+//screen settings under which the custom layout was saved
 void MyFrame::onLoadCustomLayout(wxCommandEvent& WXUNUSED(event))
 { 
+	//executes if the applicatin is set to save custom layouts with screen 
+	//settings..this is set at the beggining of this .cpp file. If the application
+	//was set to save custom layouts with screen settings the application will
+	//load custom layouts with the expectation of screen settings being in 
+	//the filename
 	if(SAVE_CUSTOM_LAYOUTS_WITH_SCREEN_SETTINGS)
 	{
 		loadCustomLayoutWithScreenSettings();
@@ -1186,19 +1273,21 @@ void MyFrame::onLoadCustomLayout(wxCommandEvent& WXUNUSED(event))
 	}	
 }
 
+//jma342--this function is triggered when the load custom layout is executed
 void MyFrame::loadCustomLayoutWithOUTScreenSettings()
 {
 	    wxFileDialog 
         openFileDialog(this, _("Load Screen Layout"), "", "",
                         "Screen Layouts (*.txt)|*.txt", wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 
+	//executes if the user chooses to cancel file dialog
     if (openFileDialog.ShowModal() == wxID_CANCEL)
-        return;     // the user changed idea...
+        return;
         
-    // proceed loading the file chosen by the user;
-    // this can be done with e.g. wxWidgets input streams:
+   //intialise the input stream
     wxFileInputStream input_stream(openFileDialog.GetPath());
 
+	//executes if the input stream wasn't inialised ok
     if (!input_stream.IsOk())
     {
         wxMessageBox("Cannot open file '%s'.", openFileDialog.GetPath());
@@ -1207,15 +1296,25 @@ void MyFrame::loadCustomLayoutWithOUTScreenSettings()
 
 	wxString perspective = "";
 
+	//wraps input stream in text input stream
 	wxTextInputStream in(input_stream);
+
+	//reads layout from file
 	perspective = in.ReadLine();
 
+	//loads layout onto the screen
 	mainWindow.LoadPerspective(perspective);
+
+	//updates the subscreens toolbar to reflect
+	//the panes on screen
 	setSubScreensOnToolBar();
 
+	//update the screen to display the loaded layout
 	mainWindow.Update();
 }
 
+//jma342--this function loads custom layouts with regard for the
+//screen settings under which the custom layout is saved
 void MyFrame::loadCustomLayoutWithScreenSettings()
 {
 	    wxFileDialog 
@@ -1273,7 +1372,6 @@ void MyFrame::loadCustomLayoutWithScreenSettings()
 	}
 	
 }
-
 
 void MyFrame::OnDropDownToolbarItem_eventsList(wxAuiToolBarEvent& evt)
 {
