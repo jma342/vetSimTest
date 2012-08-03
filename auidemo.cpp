@@ -1,13 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////
-// Name:        auidemo.cpp
-// Purpose:     wxaui: wx advanced user interface - sample/test program
-// Author:      Benjamin I. Williams
-// Modified by:
-// Created:     2005-10-03
-// RCS-ID:      $Id$
-// Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
-// Licence:     wxWindows Library Licence, Version 3.1
-///////////////////////////////////////////////////////////////////////////////
 #include "auidemo.h"
 #include "wx\wfstream.h"
 
@@ -21,6 +11,7 @@ const bool SAVE_CUSTOM_LAYOUTS_WITH_SCREEN_SETTINGS = true;
 DECLARE_APP(MyApp)
 IMPLEMENT_APP(MyApp)
 
+//intialises the frame and displays it
 bool MyApp::OnInit()
 {
     if ( !wxApp::OnInit() )
@@ -31,12 +22,12 @@ bool MyApp::OnInit()
                                  wxT("Vet Simulator"),
                                  wxDefaultPosition,
 								 wxSize(wxSystemSettings::GetMetric(wxSYS_SCREEN_X), wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)));
-                                 //wxSize(800, 600));
     frame->Show();
 
     return true;
 }
 
+//captures the events to be emitted by the frame and binds the respective methods to their ids
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     
 	/*FileMenuEvents*/
@@ -45,6 +36,8 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_MENU(ID_ImportVocalSounds, MyFrame::onImportVocalSounds)
 	EVT_MENU(ID_ImportMediaFiles, MyFrame::onImportMediaFiles)
 	EVT_MENU(ID_AddMediaFiles, MyFrame::onAddMediaFiles)
+	EVT_MENU(ID_saveLayout, MyFrame::onSaveCustomLayout)
+	EVT_MENU(ID_loadLayout, MyFrame::onLoadCustomLayout)
 	EVT_MENU(ID_Exit, MyFrame::onExit)
 
 	/*ViewMenuEvents*/
@@ -70,7 +63,7 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_MENU(ID_ManualMode, MyFrame::onManualMode)
 	EVT_MENU(ID_PreProgrammedMode, MyFrame::onPreProgrammedMode)
 
-	/*CustomizeDefaultScreenLayout*/
+	/*CustomizeScreenLayout*/
 	EVT_MENU(ID_mannequin, MyFrame::onMannequin)
 	EVT_MENU(ID_instructorPatientMonitor, MyFrame::onInstructorPatientMonitor)
 	EVT_MENU(ID_eventsLog, MyFrame::onEventsLog)
@@ -82,18 +75,15 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_MENU(ID_eventsList_ABC, MyFrame::onEventsList_ABC)
 	EVT_MENU(ID_eventsList_Misc, MyFrame::onEventsList_Misc)
 	EVT_MENU(ID_eventsList_Med, MyFrame::onEventsList_Med)
-
-	EVT_MENU(ID_saveLayout, MyFrame::onSaveCustomLayout)
-	EVT_MENU(ID_loadLayout, MyFrame::onLoadCustomLayout)
-
 	EVT_MENU(ID_adminOverwritePresetLayouts, MyFrame::onOverwritePresetLayout)
 
+	/*Pane events*/
 	EVT_AUI_PANE_CLOSE(MyFrame::OnPaneClose)
 	EVT_AUI_PANE_MAXIMIZE(MyFrame::onPaneMaximize)
 	EVT_AUI_PANE_RESTORE(MyFrame::onRestorePane)
 END_EVENT_TABLE()
 
-
+//jma342--sets up the frame by building the menus, toolbars and the panes
 MyFrame::MyFrame(wxWindow* parent,
                  wxWindowID id,
                  const wxString& title,
@@ -103,7 +93,7 @@ MyFrame::MyFrame(wxWindow* parent,
         : wxFrame(parent, id, title, pos, size, style)
 {
     // tell wxAuiManager to manage this frame
-    m_mgr.SetManagedWindow(this);
+    mainWindow.SetManagedWindow(this);
 
     // set frame icon
     SetIcon(wxIcon(sample_xpm));
@@ -111,7 +101,7 @@ MyFrame::MyFrame(wxWindow* parent,
     // create menu
 	menuBar =  new wxMenuBar;
 
-	/*FileMenuEvents*/
+	/*FileMenuEvents--adds each of the necessary options to the file menu*/
 	menuFile = new wxMenu;
 	menuFile->Append(ID_StartScenario, ("Start Scenario"), "Starts an existing scenario");
 	menuFile->Append(ID_ImportVocalSounds, ("Import Vocal Sounds"), "Import of customized .wav files containing vocal sounds");
@@ -121,7 +111,7 @@ MyFrame::MyFrame(wxWindow* parent,
 	menuFile->Append(ID_loadLayout,("Load Layout"), "Loads Saved Layout");
 	menuFile->Append(ID_Exit, ("E&xit\tAlt-X"),"Exit the application");
 
-	/*SimulationMenuEvents*/
+	/*SimulationMenuEvents--adds each of the necessary options to the simulation menu*/
 	menuSimulation = new wxMenu;
 	menuSimulation->Append(ID_StartSimulation, ("Start Simulation"), "Start the select simulation scenario");
 	menuSimulation->Append(ID_PauseSimulation, ("Pause Simulation"), "Pause the current simulation scenario");
@@ -130,24 +120,21 @@ MyFrame::MyFrame(wxWindow* parent,
 	menuSimulation->Append(ID_DefaultScenario, ("Default Simulation"), "Select the default simulation scenario");
 	menuSimulation->Append(ID_MonitorSound, ("Monitor Sound"), "Enables or disables simulation sounds");
 
-	/*EditMenuEvents*/
+	/*EditMenuEvents--adds each of the necessary options to the edit menu*/
 	menuEdit = new wxMenu;
 	menuEdit->Append(ID_MonitorSetup, ("Patient/Monitor Setup"), "Configure Patient Monitor Setup");
 	menuEdit->Append(ID_VitalSigns, ("Vital Setups"), "Change vital signs of mannequin");
 
-	/*HelpMenuEvents*/
+	/*HelpMenuEvents--adds each of the necessary options to the help menu*/
 	menuHelp = new wxMenu;
 	menuHelp->Append(ID_About, ("&About...\tF1"),"About dialog");
 	menuHelp->Append(ID_Help, ("&Help...\tF2"),"User Manual/Help");
 
-	/*ScreenLayoutEvents*/
+	/*ScreenLayoutEvents--adds each of the necessary options to the screen menu*/
 	menuScreenLayout = new wxMenu;
 	menuScreenLayout->Append(ID_DefaultMode, ("Default Mode"),"Select the default screen layout");
 	menuScreenLayout->Append(ID_ManualMode, ("Manual Mode"),"Select screen Layout for Manual Mode");
 	menuScreenLayout->Append(ID_PreProgrammedMode, ("PreProgrammed Mode"),"Select screen Layout for PreProgrammed Mode");
-
-    wxMenu* help_menu = new wxMenu;
-    help_menu->Append(wxID_ABOUT);
 
     menuBar->Append(menuFile, _("&File"));
 	menuBar->Append(menuSimulation, _("&Simulation"));
@@ -155,129 +142,53 @@ MyFrame::MyFrame(wxWindow* parent,
 	menuBar->Append(menuScreenLayout,_("Preset Layouts"));
 	menuBar->Append(menuHelp, _("&Help"));
      
-
     SetMenuBar( menuBar);
 
     CreateStatusBar();
     GetStatusBar()->SetStatusText(_("Ready"));
 
+	//sets the best size of the screen to the current screen size
 	SetBestSize(wxSize(wxSystemSettings::GetMetric(wxSYS_SCREEN_X),
 		wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)));
 
+	//sets the max size of the screen to the current screen size
 	SetMaxSize(wxSize(wxSystemSettings::GetMetric(wxSYS_SCREEN_X),
 		wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)));
 
 	this->Maximize();
 
+	//loads all of the preset layouts stored on file
 	MyFrame::loadAllPresetLayouts();
 
-	DefaultScreenLayout();//the screen needs to be setup before it can be loaded with a new perspective...not sure why
+	//builds the initial screen layout which will remain if the saved default screen layout isn't found
+	InitialScreenLayout();//the screen needs to be setup before it can be loaded with a new perspective
 
-	//loads the saved default screen layout if one is found otherwise the above hard coded default screen layout is used
+	//loads the saved default screen layout if one is found otherwise the above initial screen layout is used
 	if(presetLayouts[DEFAULT_SCREEN_MODE].length() > 0)
 	{
-		m_mgr.LoadPerspective(presetLayouts[DEFAULT_SCREEN_MODE],true);
+		mainWindow.LoadPerspective(presetLayouts[DEFAULT_SCREEN_MODE],true);//loads the saved default layout screen
 
-		//updates the layout to fit the current screen size if its dimensions weren't built for this screen
+		//if the screen width and screen height for the default screen are null the current screen settings are affiliated with it
 		if(presetLayoutsNativeScreenWidth[DEFAULT_SCREEN_MODE] == NULL || presetLayoutsNativeScreenWidth[DEFAULT_SCREEN_MODE] == NULL)
 		{
 			presetLayoutsNativeScreenWidth[DEFAULT_SCREEN_MODE] = wxSystemSettings::GetMetric(wxSYS_SCREEN_X);
 			presetLayoutsNativeScreenHeight[DEFAULT_SCREEN_MODE] = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
 		}
+		//if the screen settings for the saved default mode exist and don't match the current screen setup
+		//the layout is updated to fit the current screen size if its dimensions weren't built for this screen
 		else if(presetLayoutsNativeScreenWidth[DEFAULT_SCREEN_MODE]!= wxSystemSettings::GetMetric(wxSYS_SCREEN_X) || 
 			presetLayoutsNativeScreenHeight[DEFAULT_SCREEN_MODE]!= wxSystemSettings::GetMetric(wxSYS_SCREEN_Y))
 		{
-			updateLayoutForCurrentScreenSize(DEFAULT_SCREEN_MODE);
+			updatePresetLayoutForCurrentScreenSize(DEFAULT_SCREEN_MODE);
 		}
 	}
 
+	//initialises the sub screens tool bar to inidicate which screens are active
 	setSubScreensOnToolBar();
 
 }
 
-void MyFrame::updateLayoutForCurrentScreenSize(int chosenScreenLayout)
-{
-	wxAuiPaneInfoArray *allPanes = &(m_mgr.GetAllPanes());
-	int adjustedWidth = 0;
-	int adjustedHeight = 0;
-
-	int size = m_mgr.GetPane("eventsList_Misc").best_size.GetWidth();//best_size.GetWidth();
-
-	for(int pane = 0;pane < allPanes->size();pane++)
-	{
-		if((*allPanes)[pane].name != "SubScreensBar" && (*allPanes)[pane].name != "OverwritePresetLayoutBar")
-		{
-			/*int hold = presetLayoutsNativeScreenWidth[chosenScreenLayout];*/
-			adjustedWidth = ceil((*allPanes)[pane].best_size.GetWidth() *((double)wxSystemSettings::GetMetric(wxSYS_SCREEN_X)/(double)presetLayoutsNativeScreenWidth[chosenScreenLayout]));
-			adjustedHeight = ceil((*allPanes)[pane].best_size.GetHeight() *((double)wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)/(double)presetLayoutsNativeScreenHeight[chosenScreenLayout]));
-
-			//attempting to resize each pane based on the current screen size and the
-			//screen size each pane was initially built for...on searching the internet it appears
-			//that the only way for this to work is to fix each pane update the screen and then
-			//make each pane resizable again followed by another screen update...this seems convoluted to 
-			//me...I believe there is a better way I just haven't been able to find one
-			(*allPanes)[pane].BestSize(adjustedWidth,adjustedHeight);
-			(*allPanes)[pane].Fixed();
-
-			m_mgr.Update();
-
-			(*allPanes)[pane].Resizable();
-
-			m_mgr.Update();
-		}	
-	}
-
-	size = m_mgr.GetPane("eventsList_Misc").best_size.GetWidth();//.best_size.GetWidth();
-
-	presetLayoutsNativeScreenWidth[chosenScreenLayout] = wxSystemSettings::GetMetric(wxSYS_SCREEN_X);
-	presetLayoutsNativeScreenHeight[chosenScreenLayout] = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
-
-	/*m_mgr.Update();*/
-
-	presetLayouts[chosenScreenLayout] = m_mgr.SavePerspective();
-
-}
-
-void MyFrame::updateCustomLayoutForCurrentScreenSize()
-{
-	wxAuiPaneInfoArray *allPanes = &(m_mgr.GetAllPanes());
-	int adjustedWidth = 0;
-	int adjustedHeight = 0;
-
-	int size = m_mgr.GetPane("eventsList_Misc").best_size.GetWidth();//best_size.GetWidth();
-
-	for(int pane = 0;pane < allPanes->size();pane++)
-	{
-		if((*allPanes)[pane].name != "SubScreensBar" && (*allPanes)[pane].name != "OverwritePresetLayoutBar")
-		{
-			/*int hold = presetLayoutsNativeScreenWidth[chosenScreenLayout];*/
-			adjustedWidth = ceil((*allPanes)[pane].best_size.GetWidth() *((double)wxSystemSettings::GetMetric(wxSYS_SCREEN_X)/(double)customLayoutNativeScreenWidth));
-			adjustedHeight = ceil((*allPanes)[pane].best_size.GetHeight() *((double)wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)/(double)customLayoutNativeScreenHeight));
-
-			//attempting to resize each pane based on the current screen size and the
-			//screen size each pane was initially built for...on searching the internet it appears
-			//that the only way for this to work is to fix each pane update the screen and then
-			//make each pane resizable again followed by another screen update...this seems convoluted to 
-			//me...I believe there is a better way I just haven't been able to find one
-			(*allPanes)[pane].BestSize(adjustedWidth,adjustedHeight);
-			(*allPanes)[pane].Fixed();
-
-			m_mgr.Update();
-
-			(*allPanes)[pane].Resizable();
-
-			m_mgr.Update();
-		}	
-	}
-
-	size = m_mgr.GetPane("eventsList_Misc").best_size.GetWidth();//.best_size.GetWidth();
-
-	customLayoutNativeScreenWidth = wxSystemSettings::GetMetric(wxSYS_SCREEN_X);
-	customLayoutNativeScreenHeight = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
-
-}
-
-void MyFrame::DefaultScreenLayout()
+void MyFrame::InitialScreenLayout()
 {
 	/*eventsList and eventsLog*/
 	eventsList_ABC = new EventsList(this,"ABC");
@@ -286,27 +197,27 @@ void MyFrame::DefaultScreenLayout()
 
 	eventsLog = new EventsLog(this);
 	
-	m_mgr.AddPane(eventsLog, wxAuiPaneInfo().
+	mainWindow.AddPane(eventsLog, wxAuiPaneInfo().
 		Name(wxT("eventsLog")).Caption(wxT("Events Log")).CloseButton().MaximizeButton().MinimizeButton().PinButton().Left().Position(0).BestSize(wxSize( 450, 206)));
 
 	/*scenario Controls*/
 	scenarioControls = new ScenarioControls(this);
-	m_mgr.AddPane(scenarioControls, wxAuiPaneInfo().
+	mainWindow.AddPane(scenarioControls, wxAuiPaneInfo().
 		Name(wxT("scenarioControls")).Caption(wxT("Scenario Controls")).CloseButton().MaximizeButton().MinimizeButton().PinButton()
 		.Left().Position(1).BestSize(wxSize( 185, 161)));
 
 	/*scenario Controls*/
 
-	m_mgr.AddPane(eventsList_ABC, wxAuiPaneInfo().
+	mainWindow.AddPane(eventsList_ABC, wxAuiPaneInfo().
 		Name(wxT("eventsList_ABC")).Caption(wxT("Events List")).CloseButton().MaximizeButton().Center().MinimizeButton().PinButton().
 		Row(0).BestSize(wxSize( 293, 206)));
 
-	m_mgr.AddPane(eventsList_Misc, wxAuiPaneInfo().
+	mainWindow.AddPane(eventsList_Misc, wxAuiPaneInfo().
 		Name(wxT("eventsList_Misc")).Caption(wxT("Events List")).CloseButton().MaximizeButton().Center().MinimizeButton().PinButton().Row(1)
 		.BestSize(wxSize( 293, 206)));
 
 
-	m_mgr.AddPane(eventsList_Med, wxAuiPaneInfo().
+	mainWindow.AddPane(eventsList_Med, wxAuiPaneInfo().
 		Name(wxT("eventsList_Med")).Caption(wxT("Events List")).CloseButton().MaximizeButton().MinimizeButton().Center().PinButton().Row(2)
 		.BestSize(wxSize( 293, 206)));
 
@@ -316,11 +227,11 @@ void MyFrame::DefaultScreenLayout()
 	mannequin = new MyScrolledWindowSmart(this);
 	instructorPatientMonitor = new MyScrolledWindowSmart(this);
 
-	m_mgr.AddPane(mannequin, wxAuiPaneInfo().
+	mainWindow.AddPane(mannequin, wxAuiPaneInfo().
 		Name(wxT("mannequin")).Caption(wxT("Mannequin Avatar")).CloseButton().MaximizeButton().MinimizeButton().PinButton().
 		BestSize(wxSize( 450, 206)).Top().Position(0));
 
-	m_mgr.AddPane(instructorPatientMonitor, wxAuiPaneInfo().
+	mainWindow.AddPane(instructorPatientMonitor, wxAuiPaneInfo().
 		Name(wxT("instructorPatientMonitor")).Caption(wxT("Instructor Patient Monitor")).CloseButton().MaximizeButton().MinimizeButton().PinButton()
 		.BestSize(wxSize( 450, 206)).Top().Position(1));
 
@@ -363,11 +274,11 @@ void MyFrame::DefaultScreenLayout()
 	layoutChoice->AppendString(wxT("PreProgrammed Mode"));
     adminOverWritePresetLayoutBar->AddControl(layoutChoice);
 
-    m_mgr.AddPane(subScreensBar, wxAuiPaneInfo().
+    mainWindow.AddPane(subScreensBar, wxAuiPaneInfo().
                   Name(wxT("SubScreensBar")).Caption(wxT("SubScreens Toolbar")).
                   ToolbarPane().Top());
 
-	m_mgr.AddPane(adminOverWritePresetLayoutBar, wxAuiPaneInfo().
+	mainWindow.AddPane(adminOverWritePresetLayoutBar, wxAuiPaneInfo().
                   Name(wxT("OverwritePresetLayoutBar")).Caption(wxT("Preset Layout Toolbar")).
                   ToolbarPane().Top());
 	/*subscreens toolbar*/
@@ -396,72 +307,145 @@ void MyFrame::DefaultScreenLayout()
 	((EventsList*)eventsList_Med)->setEventsLog((EventsLog*) eventsLog);
 	((EventsList*)eventsList_Med)->setScenarioControls((ScenarioControls*)scenarioControls);
 
-	 m_mgr.Update();
+	 mainWindow.Update();
 }
 
+//jma342--updates a preset layout to fit the current screen size
+void MyFrame::updatePresetLayoutForCurrentScreenSize(int chosenScreenLayout)
+{
+	//captures an array of all of the panes on screen
+	wxAuiPaneInfoArray *allPanes = &(mainWindow.GetAllPanes());
+	int adjustedWidth = 0;
+	int adjustedHeight = 0;
+
+	//loops through each pane and adjusts them to fit the current screen size
+	for(int pane = 0;pane < allPanes->size();pane++)
+	{
+		//updates all panes except the two toolbars
+		if((*allPanes)[pane].name != "SubScreensBar" && (*allPanes)[pane].name != "OverwritePresetLayoutBar")
+		{
+			adjustedWidth = ceil((*allPanes)[pane].best_size.GetWidth() *((double)wxSystemSettings::GetMetric(wxSYS_SCREEN_X)/(double)presetLayoutsNativeScreenWidth[chosenScreenLayout]));
+			adjustedHeight = ceil((*allPanes)[pane].best_size.GetHeight() *((double)wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)/(double)presetLayoutsNativeScreenHeight[chosenScreenLayout]));
+
+			//attempting to resize each pane based on the current screen size and the
+			//screen size each pane was initially built for...on searching the internet it appears
+			//that the only way for this to work is to fix(prevents a pane from being moved) each pane update the screen and then
+			//make each pane resizable again followed by another screen update...this seems convoluted to 
+			//me...I believe there is a better way I just haven't been able to find one
+			(*allPanes)[pane].BestSize(adjustedWidth,adjustedHeight);
+			(*allPanes)[pane].Fixed();
+
+			mainWindow.Update();
+
+			(*allPanes)[pane].Resizable();
+
+			mainWindow.Update();
+		}	
+	}
+
+	//stores the current screen settings for the chosen preset layout
+	presetLayoutsNativeScreenWidth[chosenScreenLayout] = wxSystemSettings::GetMetric(wxSYS_SCREEN_X);
+	presetLayoutsNativeScreenHeight[chosenScreenLayout] = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
+
+	//stores the current screen layout for the chosen preset layout
+	presetLayouts[chosenScreenLayout] = mainWindow.SavePerspective();
+
+}
+
+//jma342--uupdates a custom layout to fit the current screen size
+void MyFrame::updateCustomLayoutForCurrentScreenSize()
+{
+	//captures an array of all of the panes on screen
+	wxAuiPaneInfoArray *allPanes = &(mainWindow.GetAllPanes());
+	int adjustedWidth = 0;
+	int adjustedHeight = 0;
+
+	//loops through each pane and adjusts them to fit the current screen size
+	for(int pane = 0;pane < allPanes->size();pane++)
+	{
+		//updates all panes except the two toolbars
+		if((*allPanes)[pane].name != "SubScreensBar" && (*allPanes)[pane].name != "OverwritePresetLayoutBar")
+		{
+			/*int hold = presetLayoutsNativeScreenWidth[chosenScreenLayout];*/
+			adjustedWidth = ceil((*allPanes)[pane].best_size.GetWidth() *((double)wxSystemSettings::GetMetric(wxSYS_SCREEN_X)/(double)customLayoutNativeScreenWidth));
+			adjustedHeight = ceil((*allPanes)[pane].best_size.GetHeight() *((double)wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)/(double)customLayoutNativeScreenHeight));
+
+			//attempting to resize each pane based on the current screen size and the
+			//screen size each pane was initially built for...on searching the internet it appears
+			//that the only way for this to work is to fix each pane update the screen and then
+			//make each pane resizable again followed by another screen update...this seems convoluted to 
+			//me...I believe there is a better way I just haven't been able to find one
+			(*allPanes)[pane].BestSize(adjustedWidth,adjustedHeight);
+			(*allPanes)[pane].Fixed();
+
+			mainWindow.Update();
+
+			(*allPanes)[pane].Resizable();
+
+			mainWindow.Update();
+		}	
+	}
+
+	//stores the current screen settings for the chosen custom layout
+	customLayoutNativeScreenWidth = wxSystemSettings::GetMetric(wxSYS_SCREEN_X);
+	customLayoutNativeScreenHeight = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
+
+}
+
+
+//jma342--destroys the manager for the panes
 MyFrame::~MyFrame()
 {
-    m_mgr.UnInit();
+    mainWindow.UnInit();
 }
 
+//jma342--updates the chosen preset layout to best fit the current screen size
+void MyFrame::updateChosenPresetLayout(int mode)
+{
+	//loads the default layout
+	mainWindow.LoadPerspective(presetLayouts[mode]);
+
+	//updates the screens toolbar
+	setSubScreensOnToolBar();
+
+	//updates the screen to reflect the loaded layout
+	mainWindow.Update();
+
+	//if the screen width and screen height are null the current screen settings are affiliated with it
+	if(presetLayoutsNativeScreenWidth[mode] == NULL || presetLayoutsNativeScreenWidth[mode] == NULL)
+	{
+		presetLayoutsNativeScreenWidth[mode] = wxSystemSettings::GetMetric(wxSYS_SCREEN_X);
+		presetLayoutsNativeScreenHeight[mode] = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
+	}
+
+	//updates the layout to fit the current screen size if its dimensions weren't built for this screen
+	else if(presetLayoutsNativeScreenWidth[mode]!= wxSystemSettings::GetMetric(wxSYS_SCREEN_X) || 
+		presetLayoutsNativeScreenHeight[mode]!= wxSystemSettings::GetMetric(wxSYS_SCREEN_Y))
+	{
+		updatePresetLayoutForCurrentScreenSize(mode);
+	}
+}
+
+//jma342--this function is triggered when the default mode option is chosen.
 void MyFrame::onDefaultMode(wxCommandEvent& WXUNUSED(event))
 {
-	m_mgr.LoadPerspective(presetLayouts[DEFAULT_SCREEN_MODE]);
-	setSubScreensOnToolBar();
-	m_mgr.Update();
-
-	//updates the layout to fit the current screen size if its dimensions weren't built for this screen
-	if(presetLayoutsNativeScreenWidth[DEFAULT_SCREEN_MODE] == NULL || presetLayoutsNativeScreenWidth[DEFAULT_SCREEN_MODE] == NULL)
-	{
-		presetLayoutsNativeScreenWidth[DEFAULT_SCREEN_MODE] = wxSystemSettings::GetMetric(wxSYS_SCREEN_X);
-		presetLayoutsNativeScreenHeight[DEFAULT_SCREEN_MODE] = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
-	}
-	else if(presetLayoutsNativeScreenWidth[DEFAULT_SCREEN_MODE]!= wxSystemSettings::GetMetric(wxSYS_SCREEN_X) || 
-		presetLayoutsNativeScreenHeight[DEFAULT_SCREEN_MODE]!= wxSystemSettings::GetMetric(wxSYS_SCREEN_Y))
-	{
-		updateLayoutForCurrentScreenSize(DEFAULT_SCREEN_MODE);
-	}
+	updateChosenPresetLayout(DEFAULT_SCREEN_MODE);
 }
 
+//jma342--this function is triggered when the manual mode option is chosen.
 void MyFrame::onManualMode(wxCommandEvent& WXUNUSED(event))
 {
-	m_mgr.LoadPerspective(presetLayouts[MANUAL_SCREEN_MODE]);
-	setSubScreensOnToolBar();
-	m_mgr.Update();
-
-	//updates the layout to fit the current screen size if its dimensions weren't built for this screen
-	if(presetLayoutsNativeScreenWidth[MANUAL_SCREEN_MODE] == NULL || presetLayoutsNativeScreenHeight[MANUAL_SCREEN_MODE] == NULL)
-	{
-		presetLayoutsNativeScreenWidth[MANUAL_SCREEN_MODE] = wxSystemSettings::GetMetric(wxSYS_SCREEN_X);
-		presetLayoutsNativeScreenHeight[MANUAL_SCREEN_MODE] = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
-	}
-	else if(presetLayoutsNativeScreenWidth[MANUAL_SCREEN_MODE]!= wxSystemSettings::GetMetric(wxSYS_SCREEN_X) || 
-	presetLayoutsNativeScreenHeight[MANUAL_SCREEN_MODE]!= wxSystemSettings::GetMetric(wxSYS_SCREEN_Y))
-	{
-		updateLayoutForCurrentScreenSize(MANUAL_SCREEN_MODE);
-	}
+	updateChosenPresetLayout(MANUAL_SCREEN_MODE);
 }
 
+//jma342--this function is triggered when the preProgrammed mode option is chosen.
 void MyFrame::onPreProgrammedMode(wxCommandEvent& WXUNUSED(event))
 {
-	m_mgr.LoadPerspective(presetLayouts[PREPROGRAMMED_SCREEN_MODE]);
-	setSubScreensOnToolBar();
-	m_mgr.Update();
-
-	//updates the layout to fit the current screen size if its dimensions weren't built for this screen
-	if(presetLayoutsNativeScreenWidth[PREPROGRAMMED_SCREEN_MODE] == NULL || presetLayoutsNativeScreenHeight[PREPROGRAMMED_SCREEN_MODE] == NULL)
-	{
-		presetLayoutsNativeScreenWidth[PREPROGRAMMED_SCREEN_MODE] = wxSystemSettings::GetMetric(wxSYS_SCREEN_X);
-		presetLayoutsNativeScreenHeight[PREPROGRAMMED_SCREEN_MODE] = wxSystemSettings::GetMetric(wxSYS_SCREEN_Y);
-	}
-	else if(presetLayoutsNativeScreenWidth[PREPROGRAMMED_SCREEN_MODE]!= wxSystemSettings::GetMetric(wxSYS_SCREEN_X) || 
-	presetLayoutsNativeScreenHeight[PREPROGRAMMED_SCREEN_MODE]!= wxSystemSettings::GetMetric(wxSYS_SCREEN_Y))
-	{
-		updateLayoutForCurrentScreenSize(PREPROGRAMMED_SCREEN_MODE);
-	}
+	updateChosenPresetLayout(PREPROGRAMMED_SCREEN_MODE);
 
 }
 
+//jma342--sets the subscreens toolbar to indicate which panes are active
 void MyFrame::setSubScreensOnToolBar()
 {
 	if(this->mannequin->IsShown())
@@ -538,24 +522,25 @@ void MyFrame::setSubScreensOnToolBar()
 	
 }
 
+//jma342--this is triggered when the mannequin toolbar button is executed
 void MyFrame::onMannequin(wxCommandEvent& WXUNUSED(event))
 {
 	toggleMannequin();
-	m_mgr.Update();
+	mainWindow.Update();
 }
 
+//jma342--displays or hides the mannequin window/pane depending on the toggle position of the 
+//mannequin toolbar button
 void MyFrame::toggleMannequin()
 {
-	//if(this->menuBar->IsChecked(ID_mannequin))
+	//displays mannequin pane if the mannequin toolbar button is toggled on
 	if(subScreensBar->GetToolToggled(ID_mannequin))
 	{
-		
-		m_mgr.GetPane("mannequin").Show();
-				
+		mainWindow.GetPane("mannequin").Show();
 	}
 	else
 	{
-		m_mgr.GetPane("mannequin").Hide();
+		mainWindow.GetPane("mannequin").Hide();
 	}
 
 }
@@ -563,21 +548,20 @@ void MyFrame::toggleMannequin()
 void MyFrame::onInstructorPatientMonitor(wxCommandEvent& WXUNUSED(event))
 {
 	toggleInstructorPatientMonitor();
-	m_mgr.Update();
+	mainWindow.Update();
 }
 
 void MyFrame::toggleInstructorPatientMonitor()
 {
-	//if(this->menuBar->IsChecked(ID_instructorPatientMonitor))
 	if(subScreensBar->GetToolToggled(ID_instructorPatientMonitor))
 	{
 		
-		m_mgr.GetPane("instructorPatientMonitor").Show();
+		mainWindow.GetPane("instructorPatientMonitor").Show();
 				
 	}
 	else
 	{
-		m_mgr.GetPane("instructorPatientMonitor").Hide();
+		mainWindow.GetPane("instructorPatientMonitor").Hide();
 	}
 
 }
@@ -585,7 +569,7 @@ void MyFrame::toggleInstructorPatientMonitor()
 void MyFrame::onEventsLog(wxCommandEvent& WXUNUSED(event))
 {
 	toggleEventsLog();
-	m_mgr.Update();
+	mainWindow.Update();
 }
 
 void MyFrame::toggleEventsLog()
@@ -593,11 +577,11 @@ void MyFrame::toggleEventsLog()
 	//if(this->menuBar->IsChecked(ID_eventsLog))
 	if(subScreensBar->GetToolToggled(ID_eventsLog))
 	{
-		m_mgr.GetPane("eventsLog").Show();			
+		mainWindow.GetPane("eventsLog").Show();			
 	}
 	else
 	{
-		m_mgr.GetPane("eventsLog").Hide();
+		mainWindow.GetPane("eventsLog").Hide();
 	}
 
 }
@@ -607,14 +591,14 @@ void MyFrame::onEventsList_ABC(wxCommandEvent& WXUNUSED(event))
 
 	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_ABC))
 	{
-		m_mgr.GetPane("eventsList_ABC").Show();	
+		mainWindow.GetPane("eventsList_ABC").Show();	
 	}
 	else
 	{
-		m_mgr.GetPane("eventsList_ABC").Hide();
+		mainWindow.GetPane("eventsList_ABC").Hide();
 	}
 
-	//m_mgr.Update();
+	//mainWindow.Update();
 }
 
 void MyFrame::onEventsList_Med(wxCommandEvent& WXUNUSED(event))
@@ -622,14 +606,14 @@ void MyFrame::onEventsList_Med(wxCommandEvent& WXUNUSED(event))
 
 	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Med))
 	{
-		m_mgr.GetPane("eventsList_Med").Show();	
+		mainWindow.GetPane("eventsList_Med").Show();	
 	}
 	else
 	{
-		m_mgr.GetPane("eventsList_Med").Hide();
+		mainWindow.GetPane("eventsList_Med").Hide();
 	}
 
-	//m_mgr.Update();
+	//mainWindow.Update();
 }
 
 void MyFrame::onEventsList_Misc(wxCommandEvent& WXUNUSED(event))
@@ -637,14 +621,14 @@ void MyFrame::onEventsList_Misc(wxCommandEvent& WXUNUSED(event))
 
 	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Misc))
 	{
-		m_mgr.GetPane("eventsList_Misc").Show();	
+		mainWindow.GetPane("eventsList_Misc").Show();	
 	}
 	else
 	{
-		m_mgr.GetPane("eventsList_Misc").Hide();
+		mainWindow.GetPane("eventsList_Misc").Hide();
 	}
 
-	//m_mgr.Update();
+	//mainWindow.Update();
 }
 
 void MyFrame::onEventsList_ShowAll(wxCommandEvent& WXUNUSED(event))
@@ -654,15 +638,15 @@ void MyFrame::onEventsList_ShowAll(wxCommandEvent& WXUNUSED(event))
 
 	subScreensBar->ToggleTool(ID_eventsList,true);
 
-	m_mgr.GetPane("eventsList_ABC").Show();			
-	m_mgr.GetPane("eventsList_Med").Show();
-	m_mgr.GetPane("eventsList_Misc").Show();
+	mainWindow.GetPane("eventsList_ABC").Show();			
+	mainWindow.GetPane("eventsList_Med").Show();
+	mainWindow.GetPane("eventsList_Misc").Show();
 
 	menuPopup_EventsList->Check(ID_eventsList_ABC,true);
 	menuPopup_EventsList->Check(ID_eventsList_Med,true);
 	menuPopup_EventsList->Check(ID_eventsList_Misc,true);
 
-	//m_mgr.Update();
+	//mainWindow.Update();
 }
 
 void MyFrame::onEventsList_HideAll(wxCommandEvent& WXUNUSED(event))
@@ -672,15 +656,15 @@ void MyFrame::onEventsList_HideAll(wxCommandEvent& WXUNUSED(event))
 
 	subScreensBar->ToggleTool(ID_eventsList,false);
 
-	m_mgr.GetPane("eventsList_ABC").Hide();			
-	m_mgr.GetPane("eventsList_Med").Hide();
-	m_mgr.GetPane("eventsList_Misc").Hide();
+	mainWindow.GetPane("eventsList_ABC").Hide();			
+	mainWindow.GetPane("eventsList_Med").Hide();
+	mainWindow.GetPane("eventsList_Misc").Hide();
 
 	menuPopup_EventsList->Check(ID_eventsList_ABC,false);
 	menuPopup_EventsList->Check(ID_eventsList_Med,false);
 	menuPopup_EventsList->Check(ID_eventsList_Misc,false);
 
-	//m_mgr.Update();
+	//mainWindow.Update();
 }
 
 void MyFrame::onExpandAllEventsLists(wxCommandEvent& WXUNUSED(event))
@@ -704,29 +688,29 @@ void MyFrame::toggleEventsList()
 {
 	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Misc))
 	{
-		m_mgr.GetPane("eventsList_Misc").Show();	
+		mainWindow.GetPane("eventsList_Misc").Show();	
 	}
 	else
 	{
-		m_mgr.GetPane("eventsList_Misc").Hide();
+		mainWindow.GetPane("eventsList_Misc").Hide();
 	}
 
 	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Med))
 	{
-		m_mgr.GetPane("eventsList_Med").Show();	
+		mainWindow.GetPane("eventsList_Med").Show();	
 	}
 	else
 	{
-		m_mgr.GetPane("eventsList_Med").Hide();
+		mainWindow.GetPane("eventsList_Med").Hide();
 	}
 
 	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Misc))
 	{
-		m_mgr.GetPane("eventsList_ABC").Show();	
+		mainWindow.GetPane("eventsList_ABC").Show();	
 	}
 	else
 	{
-		m_mgr.GetPane("eventsList_ABC").Hide();
+		mainWindow.GetPane("eventsList_ABC").Hide();
 	}
 
 }
@@ -734,7 +718,7 @@ void MyFrame::toggleEventsList()
 void MyFrame::onScenarioControls(wxCommandEvent& WXUNUSED(event))
 {
 	toggleScenarioControls();
-	m_mgr.Update();
+	mainWindow.Update();
 }
 
 void MyFrame::toggleScenarioControls()
@@ -742,12 +726,12 @@ void MyFrame::toggleScenarioControls()
 	//if(this->menuBar->IsChecked(ID_scenarioControls))
 	if(subScreensBar->GetToolToggled(ID_scenarioControls))
 	{
-		m_mgr.GetPane("scenarioControls").Show();			
+		mainWindow.GetPane("scenarioControls").Show();			
 	}
 
 	else
 	{
-		m_mgr.GetPane("scenarioControls").Hide();			
+		mainWindow.GetPane("scenarioControls").Hide();			
 	}
 
 }
@@ -782,7 +766,7 @@ void MyFrame::onOverwritePresetLayout(wxCommandEvent& WXUNUSED(event))
 	}
 
 	this->adminOverWritePresetLayoutBar->ToggleTool(ID_adminOverwritePresetLayouts,false);
-	m_mgr.Update();
+	mainWindow.Update();
 	
 }
 
@@ -823,11 +807,11 @@ void MyFrame::overWritePresetLayout(int chosenPresetLayout)
     wxFileOutputStream outputLayout("PresetLayouts\\"+filePathLayout);
 
 	wxTextOutputStream out(outputLayout);
-	out.WriteString(m_mgr.SavePerspective());
+	out.WriteString(mainWindow.SavePerspective());
 		
 	outputLayout.Close();
 
-	presetLayouts[chosenPresetLayout] = m_mgr.SavePerspective();
+	presetLayouts[chosenPresetLayout] = mainWindow.SavePerspective();
 
 	//write the native screen settings for the layout to file
 	wxFileOutputStream outputNativeScreen("PresetLayouts\\"+filePathNativeScreen);
@@ -961,7 +945,7 @@ void MyFrame::saveCustomLayoutWithOUTScreenSettings()
 
 		
 	wxTextOutputStream out(output_stream);
-	out.WriteString(m_mgr.SavePerspective());
+	out.WriteString(mainWindow.SavePerspective());
 		
 	output_stream.Close();
 
@@ -1185,7 +1169,7 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 
 		
 	wxTextOutputStream out(output_stream);
-	out.WriteString(m_mgr.SavePerspective());
+	out.WriteString(mainWindow.SavePerspective());
 		
 	output_stream.Close();
 }
@@ -1226,10 +1210,10 @@ void MyFrame::loadCustomLayoutWithOUTScreenSettings()
 	wxTextInputStream in(input_stream);
 	perspective = in.ReadLine();
 
-	m_mgr.LoadPerspective(perspective);
+	mainWindow.LoadPerspective(perspective);
 	setSubScreensOnToolBar();
 
-	m_mgr.Update();
+	mainWindow.Update();
 }
 
 void MyFrame::loadCustomLayoutWithScreenSettings()
@@ -1256,10 +1240,10 @@ void MyFrame::loadCustomLayoutWithScreenSettings()
 	wxTextInputStream in(input_stream);
 	perspective = in.ReadLine();
 
-	m_mgr.LoadPerspective(perspective);
+	mainWindow.LoadPerspective(perspective);
 	setSubScreensOnToolBar();
 
-	m_mgr.Update();
+	mainWindow.Update();
 
 	wxRegEx extractDimensions("_[0-9]+_[0-9]+");
 
@@ -1314,7 +1298,7 @@ void MyFrame::OnDropDownToolbarItem_eventsList(wxAuiToolBarEvent& evt)
 			tb->ToggleTool(ID_eventsList, false);
 		}
 
-		m_mgr.Update();
+		mainWindow.Update();
 
     }
 }
@@ -1445,7 +1429,7 @@ void MyFrame::OnPaneClose(wxAuiManagerEvent& evt)
 
 	if(evt.GetPane()->IsMaximized())
 	{
-		m_mgr.LoadPerspective(currentPerspective,true);
+		mainWindow.LoadPerspective(currentPerspective,true);
 
 		//on maximization of these panes the corresponding menu for eventslist is disabled
 		//on minimzation the menu options are enabled
@@ -1463,7 +1447,7 @@ void MyFrame::OnPaneClose(wxAuiManagerEvent& evt)
 
 void MyFrame::onPaneMaximize(wxAuiManagerEvent& evt)
 {
-	currentPerspective = m_mgr.SavePerspective();
+	currentPerspective = mainWindow.SavePerspective();
 
 	evt.GetPane()->Floatable(false);//prevents the pane from becoming floatable when maximized due to 
 									//the window becoming unmovable if the pane(eventslists) is unchecked
@@ -1478,14 +1462,14 @@ void MyFrame::onPaneMaximize(wxAuiManagerEvent& evt)
 		this->menuPopup_EventsList->Enable(ID_eventsList_HideAll,false);
 	}
 
-	m_mgr.Update();
+	mainWindow.Update();
 }
 
 void MyFrame::onRestorePane(wxAuiManagerEvent& evt)
 {
 	if(evt.GetPane()->IsMaximized())
 	{
-		m_mgr.LoadPerspective(currentPerspective,true);
+		mainWindow.LoadPerspective(currentPerspective,true);
 
 		//on maximization of these panes the corresponding menu for eventslist is disabled
 		//on minimzation the menu options are enabled

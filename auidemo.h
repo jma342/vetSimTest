@@ -115,7 +115,7 @@ public:
 
 private:
 
-	 wxAuiManager m_mgr;
+	 wxAuiManager mainWindow;
 	/*FileMenuEvents*/
 	void onStartScenario(wxCommandEvent& event);
 	void onMonitorSound(wxCommandEvent& event);
@@ -160,8 +160,7 @@ private:
 	void onScenarioControls(wxCommandEvent& event);
 	void OnDropDownToolbarItem_eventsList(wxAuiToolBarEvent& evt);
 
-	void DefaultScreenLayout();
-	//void setScreenLayout(int mode);
+	void InitialScreenLayout();
 	void setSubScreensOnToolBar();
 
 	void onSaveCustomLayout(wxCommandEvent& event);
@@ -183,7 +182,8 @@ private:
 
 	void loadAllPresetLayouts();
 
-	void updateLayoutForCurrentScreenSize(int chosenScreenLayout);
+	void updatePresetLayoutForCurrentScreenSize(int chosenScreenLayout);
+	void updateChosenPresetLayout(int mode);
 	void updateCustomLayoutForCurrentScreenSize();
 	void saveCustomLayoutWithScreenSettings();
 	void saveCustomLayoutWithOUTScreenSettings();
