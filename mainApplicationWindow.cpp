@@ -31,7 +31,6 @@ bool MyApp::OnInit()
 BEGIN_EVENT_TABLE(MyFrame, wxFrame)
     
 	/*FileMenuEvents*/
-	EVT_MENU(ID_StartScenario, MyFrame::onStartScenario)
 	EVT_MENU(ID_MonitorSound, MyFrame::onMonitorSound)
 	EVT_MENU(ID_ImportVocalSounds, MyFrame::onImportVocalSounds)
 	EVT_MENU(ID_ImportMediaFiles, MyFrame::onImportMediaFiles)
@@ -40,19 +39,13 @@ BEGIN_EVENT_TABLE(MyFrame, wxFrame)
 	EVT_MENU(ID_loadLayout, MyFrame::onLoadCustomLayout)
 	EVT_MENU(ID_Exit, MyFrame::onExit)
 
-	/*ViewMenuEvents*/
-	EVT_MENU(ID_PatientInstructorMonitor, MyFrame::onPatientInstructorMonitor)
-
-	/*SimulationMenuEvents*/
-	EVT_MENU(ID_StartSimulation, MyFrame::onStartSimulation)
-	EVT_MENU(ID_PauseSimulation, MyFrame::onPauseSimulation)
-	EVT_MENU(ID_FastForward, MyFrame::onFastForward)
+	/*ScenarioMenuEvents*/
+	EVT_MENU(ID_StartScenario, MyFrame::onStartScenario)
+	EVT_MENU(ID_PlayScenario, MyFrame::onPlayScenario)
+	EVT_MENU(ID_PauseScenario, MyFrame::onPauseScenario)
+	EVT_MENU(ID_NextState, MyFrame::onNextState)
 	EVT_MENU(ID_HaltScenario, MyFrame::onHaltScenario)
 	EVT_MENU(ID_DefaultScenario, MyFrame::onDefaultScenario)
-
-	/*EditMenuEvents*/
-	EVT_MENU(ID_MonitorSetup, MyFrame::onMonitorSetup)
-	EVT_MENU(ID_VitalSigns, MyFrame::onVitalSigns)
 
 	/*HelpMenuEvents*/
 	EVT_MENU(ID_About, MyFrame::onAbout)
@@ -103,7 +96,6 @@ MyFrame::MyFrame(wxWindow* parent,
 
 	/*FileMenuEvents--adds each of the necessary options to the file menu*/
 	menuFile = new wxMenu;
-	menuFile->Append(ID_StartScenario, ("Start Scenario"), "Starts an existing scenario");
 	menuFile->Append(ID_ImportVocalSounds, ("Import Vocal Sounds"), "Import of customized .wav files containing vocal sounds");
 	menuFile->Append(ID_ImportMediaFiles, ("Import Media Files"), "For the importing of media files");
 	menuFile->Append(ID_AddMediaFiles, ("Add Media Files"), "Add media files to a simulation");
@@ -112,18 +104,14 @@ MyFrame::MyFrame(wxWindow* parent,
 	menuFile->Append(ID_Exit, ("E&xit\tAlt-X"),"Exit the application");
 
 	/*SimulationMenuEvents--adds each of the necessary options to the simulation menu*/
-	menuSimulation = new wxMenu;
-	menuSimulation->Append(ID_StartSimulation, ("Start Simulation"), "Start the select simulation scenario");
-	menuSimulation->Append(ID_PauseSimulation, ("Pause Simulation"), "Pause the current simulation scenario");
-	menuSimulation->Append(ID_FastForward, ("Fast Forward Simulation "), "Fast Forward the current simulation scenario");
-	menuSimulation->Append(ID_HaltScenario, ("Halt Simulation"), "Halt the current simulation scenario");
-	menuSimulation->Append(ID_DefaultScenario, ("Default Simulation"), "Select the default simulation scenario");
-	menuSimulation->Append(ID_MonitorSound, ("Monitor Sound"), "Enables or disables simulation sounds");
-
-	/*EditMenuEvents--adds each of the necessary options to the edit menu*/
-	menuEdit = new wxMenu;
-	menuEdit->Append(ID_MonitorSetup, ("Patient/Monitor Setup"), "Configure Patient Monitor Setup");
-	menuEdit->Append(ID_VitalSigns, ("Vital Setups"), "Change vital signs of mannequin");
+	menuScenario = new wxMenu;
+	menuScenario->Append(ID_StartScenario, ("Start Scenario"), "Start the selected Scenario");
+	menuScenario->Append(ID_PlayScenario, ("Play Scenario"), "Play the selected Scenario");
+	menuScenario->Append(ID_PauseScenario, ("Pause Scenario"), "Pause the current Scenario");
+	menuScenario->Append(ID_NextState, ("Next State"), "Move to Next State in Scenario");
+	menuScenario->Append(ID_HaltScenario, ("Halt Scenario"), "Halt the current Scenario");
+	menuScenario->Append(ID_DefaultScenario, ("Default Scenario"), "Select the default Scenario");
+	menuScenario->Append(ID_MonitorSound, ("Monitor Sound"), "Enables or disables scenario sounds");
 
 	/*HelpMenuEvents--adds each of the necessary options to the help menu*/
 	menuHelp = new wxMenu;
@@ -137,8 +125,7 @@ MyFrame::MyFrame(wxWindow* parent,
 	menuScreenLayout->Append(ID_PreProgrammedMode, ("PreProgrammed Mode"),"Select screen Layout for PreProgrammed Mode");
 
     menuBar->Append(menuFile, _("&File"));
-	menuBar->Append(menuSimulation, _("&Simulation"));
-	menuBar->Append(menuEdit, _("&Edit"));
+	menuBar->Append(menuScenario, _("&Simulation"));
 	menuBar->Append(menuScreenLayout,_("Preset Layouts"));
 	menuBar->Append(menuHelp, _("&Help"));
      
@@ -993,14 +980,6 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
     if (saveFileDialog.ShowModal() == wxID_CANCEL)
         return;
     
-	//prevents users from entering underscores into filenames that are new
-	//the system uses underscores to extract the screen settings under which the layout was created
-	if(saveFileDialog.GetFilename().Find('_') >= 0 && !wxFile::Exists(saveFileDialog.GetPath()))
-	{
-		wxMessageBox("Please create filenames without underscores(_)...Save Operation Cancelled");
-		return;
-	}
-
 	//creates and compiles regular expression to extract
 	//the screen settings from the filename that the layout is being saved
 	//to granted the filename already exists(is not new)
@@ -1401,11 +1380,6 @@ void MyFrame::OnDropDownToolbarItem_eventsList(wxAuiToolBarEvent& evt)
 }
 
 /*FileMenuEvents*/
-void MyFrame::onStartScenario(wxCommandEvent& WXUNUSED(event))
-{
-	wxMessageBox(("This is start Scenario"));
-}
-
 void MyFrame::onMonitorSound(wxCommandEvent& WXUNUSED(event))
 {
 	wxMessageBox(("This is monitor sound"));
@@ -1431,46 +1405,35 @@ void MyFrame::onExit(wxCommandEvent& WXUNUSED(event))
 	Close(true);
 }
 
-/*ViewMenuEvents*/
-void MyFrame::onPatientInstructorMonitor(wxCommandEvent& WXUNUSED(event))
-{
-	wxMessageBox(("This is patient/instructor monitor"));
-}
-
 /*SimulationMenuEvents*/
-void MyFrame::onStartSimulation(wxCommandEvent& WXUNUSED(event))
+void MyFrame::onStartScenario(wxCommandEvent& WXUNUSED(event))
 {
-	wxMessageBox(("This is start simulation"));
+	((ScenarioControls*)scenarioControls)->startScenario();
 }
 
-void MyFrame::onPauseSimulation(wxCommandEvent& WXUNUSED(event))
+void MyFrame::onPlayScenario(wxCommandEvent& WXUNUSED(event))
 {
-	wxMessageBox(("This is pause simulation"));
+	((ScenarioControls*)scenarioControls)->playScenario();
 }
 
-void MyFrame::onFastForward(wxCommandEvent& WXUNUSED(event))
+void MyFrame::onPauseScenario(wxCommandEvent& WXUNUSED(event))
 {
-	wxMessageBox(("This is fast forward"));
+	((ScenarioControls*)scenarioControls)->pauseScenario();
+}
+
+void MyFrame::onNextState(wxCommandEvent& WXUNUSED(event))
+{
+	((ScenarioControls*)scenarioControls)->transitionToNextState();
 }
 
 void MyFrame::onHaltScenario(wxCommandEvent& WXUNUSED(event))
 {
-	wxMessageBox(("This is halt scenario"));
+	((ScenarioControls*)scenarioControls)->stopScenario();
 }
 
 void MyFrame::onDefaultScenario(wxCommandEvent& WXUNUSED(event))
 {
 	wxMessageBox(("This is default scenario"));
-}
-
-/*EditMenuEvents*/
-void MyFrame::onMonitorSetup(wxCommandEvent& WXUNUSED(event))
-{
-	wxMessageBox(("This is monitor setup"));
-}
-void MyFrame::onVitalSigns(wxCommandEvent& WXUNUSED(event))
-{
-	wxMessageBox(("This is vital signs"));
 }
 
 /*HelpMenuEvents*/
@@ -1540,6 +1503,7 @@ void MyFrame::OnPaneClose(wxAuiManagerEvent& evt)
 			this->menuPopup_EventsList->Enable(ID_eventsList_ABC,true);
 			this->menuPopup_EventsList->Enable(ID_eventsList_Med,true);
 			this->menuPopup_EventsList->Enable(ID_eventsList_Misc,true);
+			this->menuPopup_EventsList->Enable(ID_eventsList_Expand_All_Folders,true);
 			this->menuPopup_EventsList->Enable(ID_eventsList_ShowAll,true);
 			this->menuPopup_EventsList->Enable(ID_eventsList_HideAll,true);
 		}
@@ -1566,6 +1530,7 @@ void MyFrame::onPaneMaximize(wxAuiManagerEvent& evt)
 		this->menuPopup_EventsList->Enable(ID_eventsList_ABC,false);
 		this->menuPopup_EventsList->Enable(ID_eventsList_Med,false);
 		this->menuPopup_EventsList->Enable(ID_eventsList_Misc,false);
+		this->menuPopup_EventsList->Enable(ID_eventsList_Expand_All_Folders,false);
 		this->menuPopup_EventsList->Enable(ID_eventsList_ShowAll,false);
 		this->menuPopup_EventsList->Enable(ID_eventsList_HideAll,false);
 	}
@@ -1592,6 +1557,7 @@ void MyFrame::onRestorePane(wxAuiManagerEvent& evt)
 			this->menuPopup_EventsList->Enable(ID_eventsList_ABC,true);
 			this->menuPopup_EventsList->Enable(ID_eventsList_Med,true);
 			this->menuPopup_EventsList->Enable(ID_eventsList_Misc,true);
+			this->menuPopup_EventsList->Enable(ID_eventsList_Expand_All_Folders,true);
 			this->menuPopup_EventsList->Enable(ID_eventsList_ShowAll,true);
 			this->menuPopup_EventsList->Enable(ID_eventsList_HideAll,true);
 		}

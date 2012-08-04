@@ -11,15 +11,20 @@ class ScenarioControls : public MyScrolledWindowSmart
 public:
 	ScenarioControls(wxWindow *parent);
 
-	long getMilliSecondsElapsed();
+	long getScenarioMilliSecondsElapsed();
 	void setEventsLog(EventsLog *);
+	void transitionToNextState();
+	void startScenario();
+	void playScenario();
+	void stopScenario();
+	void pauseScenario();
 
 private:
 		
 	wxButton *play;
 	wxButton *start;
 	wxButton *stop;
-	wxButton *ffwd;
+	wxButton *nextState;
 	wxButton *pause;
 	wxButton *dbrief;
 	wxRichTextCtrl *time;
@@ -41,20 +46,20 @@ private:
 	wxTimer *frameTimer;
 	wxTimer *patientTimer;
 
-	long milliSecondsElapsed;
+	long scenarioMilliSecondsElapsed;
+	long frameMilliSecondsElapsed;
 
 	boolean scenarioPlaying;
 	boolean scenarioPaused;
-	boolean scenarioFastFwd;
+	boolean scenarioStarted;
 
 	void onStartScenarioButton(wxCommandEvent& event);
 	void onPlayButton(wxCommandEvent& event);
 	void onPauseButton(wxCommandEvent& event);
 	void onStopButton(wxCommandEvent& event);
-	void onFastForwardButton(wxCommandEvent& event);
+	void onNextStateButton(wxCommandEvent& event);
 	void OnDebriefButton(wxCommandEvent& event);
 	void onTimer(wxTimerEvent& event);
-
 
 	DECLARE_EVENT_TABLE()
 };

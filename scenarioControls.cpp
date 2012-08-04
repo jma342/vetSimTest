@@ -5,7 +5,7 @@ const wxWindowIDRef ID_PLAY_BUTTON   = wxWindow::NewControlId();
 const wxWindowIDRef ID_START_SCENARIO_BUTTON   = wxWindow::NewControlId();
 const wxWindowIDRef ID_PAUSE_BUTTON  = wxWindow::NewControlId();
 const wxWindowIDRef ID_STOP_BUTTON   = wxWindow::NewControlId();
-const wxWindowIDRef ID_FAST_FORWARD_BUTTON    = wxWindow::NewControlId();
+const wxWindowIDRef ID_NEXT_STATE_BUTTON    = wxWindow::NewControlId();
 const wxWindowIDRef ID_DEBRIEF_BUTTON   = wxWindow::NewControlId();
 const wxWindowIDRef ID_SCENARIO_TIMER   = wxWindow::NewControlId();
 
@@ -16,7 +16,7 @@ BEGIN_EVENT_TABLE(ScenarioControls, wxScrolled<wxWindow>)
 	EVT_BUTTON( ID_START_SCENARIO_BUTTON,  ScenarioControls::onStartScenarioButton)
 	EVT_BUTTON( ID_PAUSE_BUTTON,   ScenarioControls::onPauseButton)
 	EVT_BUTTON( ID_STOP_BUTTON, ScenarioControls::onStopButton)
-	EVT_BUTTON( ID_FAST_FORWARD_BUTTON,   ScenarioControls::onFastForwardButton)
+	EVT_BUTTON( ID_NEXT_STATE_BUTTON,   ScenarioControls::onNextStateButton)
 	EVT_BUTTON( ID_DEBRIEF_BUTTON,   ScenarioControls::OnDebriefButton)
 	EVT_TIMER (ID_SCENARIO_TIMER , ScenarioControls::onTimer)
 END_EVENT_TABLE()
@@ -25,11 +25,12 @@ END_EVENT_TABLE()
 ScenarioControls::ScenarioControls(wxWindow *parent): MyScrolledWindowSmart(parent)
 {
 	//used to increment the milliseconds elapsed and keep track of the overall run time of a scenario
-	milliSecondsElapsed = 1000;
+	scenarioMilliSecondsElapsed = 1000;
+	frameMilliSecondsElapsed = 1000;
 
 	scenarioPlaying = false;
 	scenarioPaused = false;
-	scenarioFastFwd = false;
+	scenarioStarted = false;
 
 	//sets up the scrollbars of the scenario controls to be displayed
 	//only if necessary
@@ -49,8 +50,8 @@ ScenarioControls::ScenarioControls(wxWindow *parent): MyScrolledWindowSmart(pare
 	stop = new wxButton( this, ID_STOP_BUTTON,  "[]", wxPoint(97,42),wxSize(45,25));
 	stop->SetHelpText("Stop");
 
-	ffwd = new wxButton( this, ID_FAST_FORWARD_BUTTON,  ">>|", wxPoint(143,42),wxSize(45,25));
-	ffwd->SetHelpText("Next Frame");
+	nextState = new wxButton( this, ID_NEXT_STATE_BUTTON,  ">>|", wxPoint(143,42),wxSize(45,25));
+	nextState->SetHelpText("Next State");
 
 		
 	//dbrief =  new wxButton(this, ID_DEBRIEF_BUTTON,"Debrief", wxPoint(5,101),wxSize(304,30));
@@ -96,10 +97,11 @@ ScenarioControls::ScenarioControls(wxWindow *parent): MyScrolledWindowSmart(pare
 //the Start function in the onPlayButton function.
 void ScenarioControls::onTimer(wxTimerEvent& event)
 {
-	milliSecondsElapsed+=1000;
+	scenarioMilliSecondsElapsed+=1000;
+	frameMilliSecondsElapsed+=1000;
 
-	int nMinutes = (int)(milliSecondsElapsed/ 60000);
-	int nSeconds = (int)((milliSecondsElapsed% 60000)/1000);
+	int nMinutes = (int)(scenarioMilliSecondsElapsed/ 60000);
+	int nSeconds = (int)((scenarioMilliSecondsElapsed% 60000)/1000);
 
 	wxString sTimePosition;
 	sTimePosition.Printf(wxT("%2i:%02i"), nMinutes, nSeconds);
@@ -107,33 +109,40 @@ void ScenarioControls::onTimer(wxTimerEvent& event)
 	//sets the elapsed time for the scenario
 	time->SetValue(sTimePosition.c_str());
 
+	nMinutes = (int)(frameMilliSecondsElapsed/ 60000);
+	nSeconds = (int)((frameMilliSecondsElapsed% 60000)/1000);
+
+	sTimePosition.Printf(wxT("%2i:%02i"), nMinutes, nSeconds);
+
 	//sets the elapsed time for the current frame
 	timeInframe->SetValue(sTimePosition.c_str());
 		
 }
 
-//jma342--triggered when the play button is executed
-void ScenarioControls::onPlayButton(wxCommandEvent& event)
+void ScenarioControls::playScenario()
 {
 	//starts timer by intialising it to update the timer
 	//every 1000 milliseconds
-	if(!scenarioPlaying)
+	if(!scenarioPlaying && scenarioStarted)
 	{
 		scenarioTimer->Start(1000);
 		scenarioPlaying = true;
 	}
 	//if the play button is executed after the scenario was paused
-	else if(scenarioPaused || scenarioFastFwd)
+	else if(scenarioPaused)
 	{
 		scenarioTimer->Start(1000);
 		scenarioPaused = false;
-		scenarioFastFwd = false;
 	}
-		
 }
 
-//jma342--triggered when the scenario button is executed
-void ScenarioControls::onStartScenarioButton(wxCommandEvent& event)
+//jma342--triggered when the play button is executed
+void ScenarioControls::onPlayButton(wxCommandEvent& event)
+{
+	playScenario();		
+}
+
+void ScenarioControls::startScenario()
 {
 	//if the scenario is not playing a file dialog box is used
 	//capture the scenario file to be loaded
@@ -150,26 +159,34 @@ void ScenarioControls::onStartScenarioButton(wxCommandEvent& event)
 
 		scenarioTimer->Start(1000);
 		scenarioPlaying = true;
-
-		eventsLog->updateLog(eventsLog->SCENRAIO_FRAME_MSG,"Scenario Started",milliSecondsElapsed);
+		scenarioStarted = true;
+		eventsLog->updateLog(eventsLog->SCENRAIO_FRAME_MSG,"Scenario Started",scenarioMilliSecondsElapsed);
 	}
-
 }
 
-//jma342--triggered when the pause button is executed
-void ScenarioControls::onPauseButton(wxCommandEvent& event)
+//jma342--triggered when the scenario button is executed
+void ScenarioControls::onStartScenarioButton(wxCommandEvent& event)
+{
+	startScenario();
+}
+
+void ScenarioControls::pauseScenario()
 {
 	//only executes if the pause button is not active
 	if(scenarioPlaying && !scenarioPaused)
 	{
 		scenarioTimer->Stop();
 		scenarioPaused = true;
-		scenarioFastFwd = false;
 	}
 }
 
-//jma342--triggered when the stop button executed
-void ScenarioControls::onStopButton(wxCommandEvent& event)
+//jma342--triggered when the pause button is executed
+void ScenarioControls::onPauseButton(wxCommandEvent& event)
+{
+	pauseScenario();	
+}
+
+void ScenarioControls::stopScenario()
 {
 	//only executes if the scenario play button is active...this also
 	//includes if the scneario is paused
@@ -184,24 +201,39 @@ void ScenarioControls::onStopButton(wxCommandEvent& event)
 		//sets the elapsed time for the current frame
 		timeInframe->SetValue(sTimePosition.c_str());
 
-		milliSecondsElapsed = 1000;
+		scenarioMilliSecondsElapsed = 1000;
+		frameMilliSecondsElapsed = 1000;
 
 		scenarioTimer->Stop();
 		scenarioPaused = false;
 		scenarioPlaying = false;
-		scenarioFastFwd = false;
 	}
-
 }
 
-void ScenarioControls::onFastForwardButton(wxCommandEvent& event)
+//jma342--triggered when the stop button executed
+void ScenarioControls::onStopButton(wxCommandEvent& event)
 {
-	if(scenarioPlaying && !scenarioFastFwd)
+	stopScenario();
+}
+
+void ScenarioControls::transitionToNextState()
+{
+	if(scenarioPlaying)
 	{
-		scenarioPaused = false;
-		scenarioFastFwd = true;
-		scenarioTimer->Start(1);
+		frameMilliSecondsElapsed = 1000;
+
+		wxString sTimePosition;
+		sTimePosition.Printf(wxT("%2i:%02i"), 0, 0);
+
+		//resets the elapsed time for the next frame
+		timeInframe->SetValue(sTimePosition.c_str());
+
 	}
+}
+
+void ScenarioControls::onNextStateButton(wxCommandEvent& event)
+{
+	transitionToNextState();
 }
 
 void ScenarioControls::OnDebriefButton(wxCommandEvent& event)
@@ -213,9 +245,9 @@ void ScenarioControls::setEventsLog(EventsLog *eventsLog)
 	this->eventsLog = (EventsLog*)eventsLog;
 }
 
-//jma342--returns the milliseconds elapsed
-long ScenarioControls::getMilliSecondsElapsed()
+//jma342--returns the milliseconds elapsed for the scenario
+long ScenarioControls::getScenarioMilliSecondsElapsed()
 {
-	return milliSecondsElapsed;
+	return scenarioMilliSecondsElapsed;
 }
 

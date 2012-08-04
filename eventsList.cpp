@@ -155,7 +155,7 @@ void EventsList::rightClick(wxTreeListEvent& event)
 			//when an item in the events list is administered it is logged in the events log.
 			//this function call utilises the events log pointer as well as the scenario controls pointer to 
 			//get the time stamp
-			eventsLog->updateLog(eventsLog->EVENT_LIST_MSG,list->GetItemText(item),sctrl->getMilliSecondsElapsed());
+			eventsLog->updateLog(eventsLog->EVENT_LIST_MSG,list->GetItemText(item),sctrl->getScenarioMilliSecondsElapsed());
 			break;
 
 
@@ -202,7 +202,7 @@ void EventsList::doubleClick(wxTreeListEvent& event)
 		//when an item in the events list is administered it is logged in the events log.
 		//this function call utilises the events log pointer as well as the scenario controls pointer to 
 		//get the time stamp
-		eventsLog->updateLog(eventsLog->EVENT_LIST_MSG,list->GetItemText(event.GetItem()),sctrl->getMilliSecondsElapsed());
+		eventsLog->updateLog(eventsLog->EVENT_LIST_MSG,list->GetItemText(event.GetItem()),sctrl->getScenarioMilliSecondsElapsed());
 	}
 }
 

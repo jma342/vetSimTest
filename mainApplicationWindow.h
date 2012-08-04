@@ -52,26 +52,19 @@ class MyFrame : public wxFrame
     enum
     {
         /*FileMenuEvents*/
-		ID_StartScenario /*= 1*/,
 		ID_MonitorSound,
 		ID_ImportVocalSounds,
 		ID_ImportMediaFiles,
 		ID_AddMediaFiles,
 		ID_Exit,
 
-		/*ViewMenuEvents*/
-		ID_PatientInstructorMonitor,
-
-		/*SimulationMenuEvents*/
-		ID_StartSimulation,
-		ID_PauseSimulation,
-		ID_FastForward,
+		/*ScenarioMenuEvents*/
+		ID_StartScenario,
+		ID_PlayScenario,
+		ID_PauseScenario,
+		ID_NextState,
 		ID_HaltScenario,
 		ID_DefaultScenario,
-
-		/*EditMenuEvents*/
-		ID_MonitorSetup,
-		ID_VitalSigns,
 
 		/*HelpMenuEvents*/
 		ID_About,
@@ -117,7 +110,6 @@ private:
 
 	 wxAuiManager mainWindow;
 	/*FileMenuEvents*/
-	void onStartScenario(wxCommandEvent& event);
 	void onMonitorSound(wxCommandEvent& event);
 	void onImportVocalSounds(wxCommandEvent& event);
 	void onImportMediaFiles(wxCommandEvent& event);
@@ -128,9 +120,10 @@ private:
 	void onPatientInstructorMonitor(wxCommandEvent& event);
 
 	/*SimulationMenuEvents*/
-	void onStartSimulation(wxCommandEvent& event);
-	void onPauseSimulation(wxCommandEvent& event);
-	void onFastForward(wxCommandEvent& event);
+	void onStartScenario(wxCommandEvent& event);
+	void onPlayScenario(wxCommandEvent& event);
+	void onPauseScenario(wxCommandEvent& event);
+	void onNextState(wxCommandEvent& event);
 	void onHaltScenario(wxCommandEvent& event);
 	void onDefaultScenario(wxCommandEvent& event);
 
@@ -208,7 +201,7 @@ private:
 	wxMenu *menuScreenLayout;
 	wxMenu *menuHelp;
 	wxMenu *menuEdit;
-	wxMenu *menuSimulation;
+	wxMenu *menuScenario;
 	wxMenu *menuView;
 	wxMenu *menuFile;
 	wxMenu *menuCustomiszeDefaultScreenLayout;
