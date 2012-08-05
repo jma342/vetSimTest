@@ -19,7 +19,7 @@ bool MyApp::OnInit()
 
     wxFrame* frame = new MyFrame(NULL,
                                  wxID_ANY,
-                                 wxT("Vet Simulator"),
+                                 wxT("Veterinary Simulator"),
                                  wxDefaultPosition,
 								 wxSize(wxSystemSettings::GetMetric(wxSYS_SCREEN_X), wxSystemSettings::GetMetric(wxSYS_SCREEN_Y)));
     frame->Show();
@@ -125,7 +125,7 @@ MyFrame::MyFrame(wxWindow* parent,
 	menuScreenLayout->Append(ID_PreProgrammedMode, ("PreProgrammed Mode"),"Select screen Layout for PreProgrammed Mode");
 
     menuBar->Append(menuFile, _("&File"));
-	menuBar->Append(menuScenario, _("&Simulation"));
+	menuBar->Append(menuScenario, _("&Scenario"));
 	menuBar->Append(menuScreenLayout,_("Preset Layouts"));
 	menuBar->Append(menuHelp, _("&Help"));
      
@@ -1443,8 +1443,7 @@ void MyFrame::onHelp(wxCommandEvent& WXUNUSED(event))
 }
 void MyFrame::onAbout(wxCommandEvent& WXUNUSED(event))
 {
-	wxMessageBox(("This is wxWidgets hello world sample"),
-		("About Hello World"), wxOK | wxICON_INFORMATION,this);
+	wxMessageBox(("Veterinary Simulator"),"Veterinary Simulator", wxOK | wxICON_INFORMATION,this);
 }
 
 //jma342--this is triggered once any pany is closed/hidden...the corresponding
