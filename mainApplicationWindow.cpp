@@ -1057,9 +1057,39 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 
 	long choice = -1;
 
+	//executes if the user chosen path being written to already doesn't exist but
+	//the system adjusted filename does exist
+	if(!wxFile::Exists(saveFileDialog.GetPath()) && wxFile::Exists(fileName))
+	{
+		wxString path;
+		wxString name;
+		wxString ext;
+
+		//simply used to extract the name for display in the following dialog
+		wxFileName::SplitPath(fileName,&path,&name,&ext);
+
+		wxMessageDialog dialog(this,
+			"Do you want to overwrite " + name + " ?",
+						"Overwrite Custom Layout",
+						wxCENTER |
+						wxYES_NO | wxICON_QUESTION);
+
+		choice = dialog.ShowModal();
+
+		if(choice == wxID_YES)
+		{
+			wxRemoveFile(fileName);
+		}
+
+		else if(choice == wxID_NO)
+		{
+			wxMessageBox("Save operation cancelled.");
+			return;
+		}
+	}
 	//executes if the user chosen path being written to file already exists and
 	//it consists of the dimensions for the current screen setting
-	if(wxFile::Exists(saveFileDialog.GetPath()) && fileName == saveFileDialog.GetPath())
+	else if(wxFile::Exists(saveFileDialog.GetPath()) && fileName == saveFileDialog.GetPath())
 	{
 		wxMessageDialog dialog(this,
 			"Do you want to overwrite " + saveFileDialog.GetFilename() + " ?",
@@ -1147,7 +1177,7 @@ void MyFrame::saveCustomLayoutWithScreenSettings()
 		//2. keeping the chosen file and overwriting the file that conflicts with the system created file
 		//3. cancelling the entire operation and leaving the 2 files untouched
 		wxMessageDialog dialog(this,
-			"Both " + saveFileDialog.GetFilename() + " and " +  name + "." + ext + " exists.\n\n " + 
+			"Both " + saveFileDialog.GetFilename() + " and " +  name + "." + ext + " exist.\n\n " + 
 			"Option 1 - Remove " + saveFileDialog.GetFilename() + " AND " +  "overwrite " + name + "." + ext + "\n\n" + 
 			"Option 2 - Keep " + saveFileDialog.GetFilename() + " AND " + " overwrite " + name + "." + ext,
 						"Overwrite Custom Layout",
