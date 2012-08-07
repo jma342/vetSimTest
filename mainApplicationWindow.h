@@ -162,8 +162,10 @@ private:
 	void toggleMannequin();
 	void toggleInstructorPatientMonitor();
 	void toggleEventsLog();
-	void toggleEventsList();
 	void toggleScenarioControls();
+	void toggleEventsList_ABC();
+	void toggleEventsList_Med();
+	void toggleEventsList_Misc();
 
 	void OnPaneClose(wxAuiManagerEvent& evt);
 	void onPaneMaximize(wxAuiManagerEvent& evt);

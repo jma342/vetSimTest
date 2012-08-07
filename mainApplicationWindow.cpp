@@ -594,8 +594,7 @@ void MyFrame::toggleEventsLog()
 
 }
 
-//jma342--this is triggered when the eventsList_ABC button is executed
-void MyFrame::onEventsList_ABC(wxCommandEvent& WXUNUSED(event))
+void MyFrame::toggleEventsList_ABC()
 {
 	//eventsList_ABC button is checked the eventsList ABC pane is displayed
 	//otherwise it is hidden
@@ -607,11 +606,16 @@ void MyFrame::onEventsList_ABC(wxCommandEvent& WXUNUSED(event))
 	{
 		mainWindow.GetPane("eventsList_ABC").Hide();
 	}
+}
+
+//jma342--this is triggered when the eventsList_ABC button is executed
+void MyFrame::onEventsList_ABC(wxCommandEvent& WXUNUSED(event))
+{
+	toggleEventsList_ABC();
 
 }
 
-//jma342--this is triggered when the eventsList_Med button is executed
-void MyFrame::onEventsList_Med(wxCommandEvent& WXUNUSED(event))
+void MyFrame::toggleEventsList_Med()
 {
 	//eventsList_Med button is checked the eventsList_Med pane is displayed
 	//otherwise it is hidden
@@ -624,9 +628,13 @@ void MyFrame::onEventsList_Med(wxCommandEvent& WXUNUSED(event))
 		mainWindow.GetPane("eventsList_Med").Hide();
 	}
 }
+//jma342--this is triggered when the eventsList_Med button is executed
+void MyFrame::onEventsList_Med(wxCommandEvent& WXUNUSED(event))
+{
+	toggleEventsList_Med();
+}
 
-//jma342--this is triggered when the eventsList_Misc button is executed
-void MyFrame::onEventsList_Misc(wxCommandEvent& WXUNUSED(event))
+void MyFrame::toggleEventsList_Misc()
 {
 	//eventsList_Misc button is checked the eventsList_Misc pane is displayed
 	//otherwise it is hidden
@@ -638,6 +646,12 @@ void MyFrame::onEventsList_Misc(wxCommandEvent& WXUNUSED(event))
 	{
 		mainWindow.GetPane("eventsList_Misc").Hide();
 	}
+}
+
+//jma342--this is triggered when the eventsList_Misc button is executed
+void MyFrame::onEventsList_Misc(wxCommandEvent& WXUNUSED(event))
+{
+	toggleEventsList_Misc();
 }
 
 //jma342--this is triggered when the eventsList ShowAll button is executed
@@ -684,7 +698,6 @@ void MyFrame::onExpandAllEventsLists(wxCommandEvent& WXUNUSED(event))
 	//in each of the events lists are expanded
 	if(this->menuPopup_EventsList->IsChecked(ID_eventsList_Expand_All_Folders))
 	{
-
 		((EventsList*)eventsList_ABC)->expandAllFolders();
 		((EventsList*)eventsList_Misc)->expandAllFolders();
 		((EventsList*)eventsList_Med)->expandAllFolders();
@@ -1523,19 +1536,12 @@ void MyFrame::OnPaneClose(wxAuiManagerEvent& evt)
 		//relaods the layout prior to the pane(window/screen) being maximized
 		mainWindow.LoadPerspective(currentPerspective,true);
 
-		//on maximization of these panes the corresponding menu for eventslist is disabled
-		//on minimzation the menu options are enabled...the reason for this is because if a pane 
+		//on maximization of these panes the toolbars are disabled
+		//on minimization of the screen they are reenabled...the reason for this is because if a pane 
 		//was unchecked to indicate it was hidden while it was maximized, it would remain on 
 		//screen still maximized and unmovable unless the layout was reset or changed
-		if(evt.GetPane()->name == "eventsList_ABC" || evt.GetPane()->name == "eventsList_Misc" || evt.GetPane()->name == "eventsList_Med")
-		{
-			this->menuPopup_EventsList->Enable(ID_eventsList_ABC,true);
-			this->menuPopup_EventsList->Enable(ID_eventsList_Med,true);
-			this->menuPopup_EventsList->Enable(ID_eventsList_Misc,true);
-			this->menuPopup_EventsList->Enable(ID_eventsList_Expand_All_Folders,true);
-			this->menuPopup_EventsList->Enable(ID_eventsList_ShowAll,true);
-			this->menuPopup_EventsList->Enable(ID_eventsList_HideAll,true);
-		}
+		this->subScreensBar->Enable(true);
+		this->adminOverWritePresetLayoutBar->Enable(true);
 	}
 }
 
@@ -1545,52 +1551,53 @@ void MyFrame::onPaneMaximize(wxAuiManagerEvent& evt)
 	//captures the current layout which will be restored 
 	//once the screen is minimized or closed while maximized
 	currentPerspective = mainWindow.SavePerspective();
+	//wxMessageBox(currentPerspective);
+
 
 	//prevents the pane from becoming floatable(undocked) when maximized due to 
 	//the window becoming unmovable as it remains maximized
 	evt.GetPane()->Floatable(false);
 
-	//on maximization of these panes the corresponding menu for eventslist is disabled
-	//on minimzation the menu options are enabled...the reason for this is because if a pane 
+	//on maximization of these panes the toolbars are disabled
+	//on minimization of the screen they are reenabled...the reason for this is because if a pane 
 	//was unchecked to indicate it was hidden while it was maximized, it would remain on 
 	//screen still maximized and unmovable unless the layout was reset or changed
-	if(evt.GetPane()->name == "eventsList_ABC" || evt.GetPane()->name == "eventsList_Misc" || evt.GetPane()->name == "eventsList_Med")
-	{
-		this->menuPopup_EventsList->Enable(ID_eventsList_ABC,false);
-		this->menuPopup_EventsList->Enable(ID_eventsList_Med,false);
-		this->menuPopup_EventsList->Enable(ID_eventsList_Misc,false);
-		this->menuPopup_EventsList->Enable(ID_eventsList_Expand_All_Folders,false);
-		this->menuPopup_EventsList->Enable(ID_eventsList_ShowAll,false);
-		this->menuPopup_EventsList->Enable(ID_eventsList_HideAll,false);
-	}
+	this->subScreensBar->Enable(false);
+	this->adminOverWritePresetLayoutBar->Enable(false);
+	
 
 	//updates the screen to reflect the changes to the layout
-	mainWindow.Update();
+	//mainWindow.Update();
 }
 
 //jma342--this is triggered once any pane is restored...this is used
 //to capture restoration after minimization from being maximized
 void MyFrame::onRestorePane(wxAuiManagerEvent& evt)
 {
+
 	if(evt.GetPane()->IsMaximized())
 	{
+		//wxMessageBox(mainWindow.SavePerspective());
 		//loads the layout captured prior to being maximized
 		mainWindow.LoadPerspective(currentPerspective,true);
-
-		//on maximization of these panes the corresponding menu for eventslist is disabled
-		//on minimzation the menu options are enabled...the reason for this is because if a pane 
+		
+		//on maximization of these panes the toolbars are disabled
+		//on minimization of the screen they are reenabled...the reason for this is because if a pane 
 		//was unchecked to indicate it was hidden while it was maximized, it would remain on 
 		//screen still maximized and unmovable unless the layout was reset or changed
-		if(evt.GetPane()->name == "eventsList_ABC" || evt.GetPane()->name == "eventsList_Misc" || evt.GetPane()->name == "eventsList_Med")
-		{
-			this->menuPopup_EventsList->Enable(ID_eventsList_ABC,true);
-			this->menuPopup_EventsList->Enable(ID_eventsList_Med,true);
-			this->menuPopup_EventsList->Enable(ID_eventsList_Misc,true);
-			this->menuPopup_EventsList->Enable(ID_eventsList_Expand_All_Folders,true);
-			this->menuPopup_EventsList->Enable(ID_eventsList_ShowAll,true);
-			this->menuPopup_EventsList->Enable(ID_eventsList_HideAll,true);
-		}
+		this->subScreensBar->Enable(true);
+		this->adminOverWritePresetLayoutBar->Enable(true);
+
+		//this cancels the behaviour of the restore pane macro. The reason for vetoing its behaviour is due to the above loaded
+		//perspective being ignored and the layout being reset to the initial screen layout, which is undesired. On looking inton framemanager.cpp
+		//which is a wxWidgets source file...it appears that restore panes restores all of the panes. If this connected to the behaviour
+		//of the macro this could explain why the all of the panes are being replenished on screen even if the loaded layout
+		//is dictating otherwise .It would have been preferrable to use the AUI_PANE_BUTTON macro which is to 
+		//be triggered when any button on a pane is executed by that isn't working when the maximize button
+		//is triggered
+		evt.Veto();
 	}
+	
 }
 
 

@@ -48,6 +48,9 @@ EventsLog::EventsLog(wxWindow *parent):MyScrolledWindowSmart(parent)
 	//mannequin it self
 	eventsLogGrid->SetEditable(false);
 
+	wxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+	sizer->Add(eventsLogGrid,wxSizerFlags(1).Expand());
+    SetSizer(sizer);
 }
 
 //jma342--used to add capture events in the events log

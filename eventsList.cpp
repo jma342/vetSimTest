@@ -73,7 +73,7 @@ void EventsList::collapseAllFolders()
 }
 
 //jma342---this is used to add elements to the trees(IT IS CURRENTLY NOT BEING USED AND DEEMED NOT NECESSARY BY PROF. FLETCHER)---but it was left in
-//to indicate how elements are added to the tree which will be used when the scenario file is loaded
+//to indicate how elements are added to the tree which will have to be done when the scenario file is loaded
 void EventsList::rightClick(wxTreeListEvent& event)
 {
 	//used to retrieve the tree item that triggered this event
