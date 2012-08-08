@@ -11,7 +11,7 @@ const bool SAVE_CUSTOM_LAYOUTS_WITH_SCREEN_SETTINGS = true;
 DECLARE_APP(MyApp)
 IMPLEMENT_APP(MyApp)
 
-//intialises the frame and displays it
+//intialises the frame and displays it. This is also treated like "main" in C++ application.
 bool MyApp::OnInit()
 {
     if ( !wxApp::OnInit() )
@@ -145,7 +145,7 @@ MyFrame::MyFrame(wxWindow* parent,
 	this->Maximize();
 
 	//loads all of the preset layouts stored on file
-	MyFrame::loadAllPresetLayouts();
+	loadAllPresetLayouts();
 
 	//builds the initial screen layout which will remain if the saved default screen layout isn't found
 	InitialScreenLayout();//the screen needs to be setup before it can be loaded with a new perspective
@@ -1508,7 +1508,6 @@ void MyFrame::OnPaneClose(wxAuiManagerEvent& evt)
 	else if(evt.pane->name == "eventsList_ABC")
 	{
 		menuPopup_EventsList->Check(ID_eventsList_ABC,false);
-
 	}
 	else if(evt.pane->name == "eventsList_Med")
 	{
@@ -1551,8 +1550,6 @@ void MyFrame::onPaneMaximize(wxAuiManagerEvent& evt)
 	//captures the current layout which will be restored 
 	//once the screen is minimized or closed while maximized
 	currentPerspective = mainWindow.SavePerspective();
-	//wxMessageBox(currentPerspective);
-
 
 	//prevents the pane from becoming floatable(undocked) when maximized due to 
 	//the window becoming unmovable as it remains maximized

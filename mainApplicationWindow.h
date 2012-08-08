@@ -38,6 +38,8 @@
 #include "wxWidgets-2.9.3\samples\sample.xpm"
 // -- application --
 
+//used to intialise the application
+//as it inherits from the wxApp class
 class MyApp : public wxApp
 {
 public:

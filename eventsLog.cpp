@@ -13,8 +13,8 @@ const int MESSAGE = 2;
 //intialises the events log object
 EventsLog::EventsLog(wxWindow *parent):MyScrolledWindowSmart(parent)
 {
-	//indicates that neither of the scroll bars will be displayed
-	this->ShowScrollbars(wxSHOW_SB_NEVER,wxSHOW_SB_NEVER);
+	//indicates that both scroll bars should always be displayed
+	this->ShowScrollbars(wxSHOW_SB_ALWAYS,wxSHOW_SB_ALWAYS);
 
 	//initialises the grid for the events log
 	eventsLogGrid = new wxGrid( this,

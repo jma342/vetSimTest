@@ -37,7 +37,9 @@ ScenarioControls::ScenarioControls(wxWindow *parent): MyScrolledWindowSmart(pare
 	this->ShowScrollbars(wxSHOW_SB_DEFAULT,wxSHOW_SB_DEFAULT);
 
 	//Scenario Controls
+
 	//intialises each of the scenario control buttons with their respective IDs, size and positions on screen
+	//these IDs are used to bind each button to its corresponding function. These IDs are bound to their functions via the above defined BIG EVENT TABLE
 	start = new wxButton(this, ID_START_SCENARIO_BUTTON,  "Start", wxPoint(5,10),wxSize(180,30));
 	start->SetHelpText("Start Scenario");
 
